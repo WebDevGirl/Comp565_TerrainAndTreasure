@@ -500,5 +500,13 @@ public class Stage : Game {
       display.RasterizerState = RasterizerState.CullNone;
       base.Draw(gameTime);  // draw all GameComponents and DrawableGameComponents
       }
+   
+    /// <summary>
+   /// The main entry point for the application.
+   /// </summary>
+   static void Main(string[] args)
+   {
+       using (Stage stage = new Stage()) { stage.Run(); }
+   }
    }
 }

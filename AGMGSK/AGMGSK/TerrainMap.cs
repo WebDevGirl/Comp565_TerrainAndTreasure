@@ -292,7 +292,7 @@ public class TerrainMap : Game {
       base.Draw(gameTime);
       }
 
-   static void Main(string[] args) {
+   static void Main2(string[] args) {
       using (TerrainMap game = new TerrainMap()) {
          game.Run(); }
          }
