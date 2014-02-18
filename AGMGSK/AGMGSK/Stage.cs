@@ -375,6 +375,13 @@ public class Stage : Game {
       m3d.addObject(new Vector3(340 * spacing, terrain.surfaceHeight(340, 340), 340 * spacing),
          new Vector3(0, 1, 0), 0.79f);
       Components.Add(m3d);
+
+       // Add Treasure To Map
+      Treasure tr = new Treasure(this, "t1", "templeV3");
+      tr.addObject(new Vector3(500 * spacing, terrain.surfaceHeight(500, 500), 500 * spacing),
+          new Vector3(0, 1, 0), 0.79f);
+      Components.Add(tr);
+
       // create walls for obstacle avoidance or path finding algorithms
       Wall wall = new Wall(this, "wall", "100x100x100Brick");
       Components.Add(wall);
