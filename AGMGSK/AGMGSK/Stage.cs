@@ -376,7 +376,7 @@ public class Stage : Game {
          new Vector3(0, 1, 0), 0.79f);
       Components.Add(m3d);
       // create walls for obstacle avoidance or path finding algorithms
-      Wall wall = new Wall(this, "wall", "100x100x100Brick");
+      Wall wall = new Wall(this, "wall", "test");
       Components.Add(wall);
       Random random = new Random();  // used for pack and cloud
       // create a Pack of dogs
@@ -500,5 +500,13 @@ public class Stage : Game {
       display.RasterizerState = RasterizerState.CullNone;
       base.Draw(gameTime);  // draw all GameComponents and DrawableGameComponents
       }
+
+   static void Main2(string[] args)
+   {
+       using (Stage game = new Stage())
+       {
+           game.Run();
+       }
+   }
    }
 }

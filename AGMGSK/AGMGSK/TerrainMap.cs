@@ -150,14 +150,96 @@ public class TerrainMap : Game {
    /// </summary>
    /// <returns>height texture</returns>
 
-   private Texture2D createHeightTexture() {
+   private Texture2D createHeightTexture()
+   {
+       float height;
+       Vector3 colorVec3;
+      
+       int step = 7;
+       int radius = 50;
+       int nCenter = 2;
+       int[,] heightMap2 = new int[textureWidth, textureWidth];
+
+       int[,] center = new int[nCenter, 2];
+       for (int i = 0; i < nCenter; i++)
+       {
+           center[i, 0] = random.Next(textureHeight);
+           center[i, 1] = random.Next(textureWidth);
+       }
+
+       int xCoordinate, zCoordinate, r;
+
+       heightMap = new Color[textureWidth, textureHeight];
+       
+       // first create the "plain" heights
+       for (int x = 0; x < textureWidth; x++)
+           for (int z = 0; z < textureHeight; z++)
+           {
+               height = ((float)random.Next(3)) / 255.0f; // float version of byte value 
+               colorVec3 = new Vector3(height, height, height);
+               heightMap[x, z] = new Color(colorVec3);
+           }
+
+       r = random.Next(nCenter);
+       xCoordinate = center[r, 0];
+       zCoordinate = center[r, 1];
+ 
+
+       for (int k = 0; k < 10000; k++) {
+           for (int x = xCoordinate - radius; x <= xCoordinate + radius; x++)
+               for (int z = zCoordinate - radius; z <= zCoordinate + radius; z++)
+                    if (x >= 0 && x < textureWidth && z >= 0 && z < textureHeight)
+                       heightMap2[x, z]+= 1;
+           int first = random.Next(2);
+           int second = random.Next(2);
+           if (first == 0)
+               xCoordinate += step;
+           else
+               xCoordinate -= step;
+           if (second == 0)
+               zCoordinate += step;
+           else
+               zCoordinate -= step;
+
+           if (xCoordinate < 0 || xCoordinate > textureWidth || zCoordinate < 0 || zCoordinate > textureHeight) {
+                r = random.Next(nCenter);
+                xCoordinate = center[r, 0];
+                zCoordinate = center[r, 1];
+           }
+       }
+
+       for (int x = 0; x < textureWidth; x++)
+           for (int z = 0; z < textureHeight; z++)
+           {
+               height = (float)heightMap2[x, z] / 255.0f;  // convert to grayscale 0.0 to 255.0f
+               heightMap[x, z] =
+                  new Color(new Vector3(height, height, height));
+           }   
+
+
+       // convert heightMap[,] to textureMap1D[]
+       textureMap1D = new Color[textureWidth * textureHeight];
+       int j = 0;
+       for (int x = 0; x < textureWidth; x++)
+           for (int z = 0; z < textureHeight; z++)
+           {
+               textureMap1D[j] = heightMap[x, z];
+               j++;
+           }
+ 
+       // create the texture to return.       
+       Texture2D newTexture = new Texture2D(device, textureWidth, textureHeight);
+       newTexture.SetData<Color>(textureMap1D);
+       return newTexture;
+   }
+   private Texture2D createHeightTexture2() {
       float height;
       Vector3 colorVec3;
       heightMap = new Color[textureWidth, textureHeight];
       // first create the "plain" heights
       for (int x = 0; x < textureWidth; x++)
          for (int z = 0; z < textureHeight; z++) {
-            height = ((float) random.Next(3))/255.0f; // float version of byte value 
+            height = ((float) random.Next(1))/255.0f; // float version of byte value 
             colorVec3 = new Vector3(height, height, height);
             heightMap[x, z] = new Color(colorVec3);
             }
@@ -295,6 +377,6 @@ public class TerrainMap : Game {
    static void Main(string[] args) {
       using (TerrainMap game = new TerrainMap()) {
          game.Run(); }
-         }
+         } 
       }
    }
