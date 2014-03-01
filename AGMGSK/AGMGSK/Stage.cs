@@ -103,8 +103,6 @@ public class Stage : Game {
    protected double fpsSecond;
    protected int draws, updates;
 
-   public List<Treasure> treasures = new List<Treasure>();
-
    /// <summary>
    /// Set the Scene.
    /// The Scene contains all "application-specific" content that is to added to
@@ -383,13 +381,6 @@ public class Stage : Game {
       tr.addObject(new Vector3(500 * spacing, terrain.surfaceHeight(500, 500), 500 * spacing),
           new Vector3(0, 1, 0), 0.79f);
       Components.Add(tr);
-      treasures.Add(tr);
-      treasures.Add(tr);
-      treasures.Add(tr);
-    
-
-      System.Diagnostics.Debug.WriteLine("We have: " + treasures.Count + " in our game");
-
 
       // create walls for obstacle avoidance or path finding algorithms
       Wall wall = new Wall(this, "wall", "100x100x100Brick");
