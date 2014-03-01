@@ -89,6 +89,7 @@
     <Compile Include="Stage.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="TerrainMap.cs" />
+    <Compile Include="Treasure.cs" />
     <Compile Include="Wall.cs" />
   </ItemGroup>
   <ItemGroup>
