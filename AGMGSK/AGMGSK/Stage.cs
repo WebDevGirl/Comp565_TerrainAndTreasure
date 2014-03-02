@@ -511,7 +511,7 @@ public class Stage : Game {
     /// <summary>
    /// The main entry point for the application.
    /// </summary>
-   static void Main(string[] args)
+   static void Main2(string[] args)
    {
        using (Stage stage = new Stage()) { stage.Run(); }
    }

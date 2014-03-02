@@ -155,19 +155,21 @@ public class TerrainMap : Game {
        float height;
        Vector3 colorVec3;
       
-       int step = 7;
-       int radius = 50;
+       int step = 3;
+       int radius = 10;
        int nCenter = 2;
        int[,] heightMap2 = new int[textureWidth, textureWidth];
 
        int[,] center = new int[nCenter, 2];
-       for (int i = 0; i < nCenter; i++)
+       center[0, 0] = 70;
+       center[0, 1] = 70;
+       center[1, 0] = 400;
+       center[1, 1] = 400;
+       /*for (int i = 0; i < nCenter; i++)
        {
            center[i, 0] = random.Next(textureHeight);
            center[i, 1] = random.Next(textureWidth);
-       }
-
-       int xCoordinate, zCoordinate, r;
+       }*/
 
        heightMap = new Color[textureWidth, textureHeight];
        
@@ -176,9 +178,11 @@ public class TerrainMap : Game {
            for (int z = 0; z < textureHeight; z++)
            {
                height = ((float)random.Next(3)) / 255.0f; // float version of byte value 
-               colorVec3 = new Vector3(height, height, height);
+               colorVec3 = new Vector3(height, height , height);
                heightMap[x, z] = new Color(colorVec3);
+               heightMap2[x, z] = 0;
            }
+       int xCoordinate, zCoordinate, r;
 
        r = random.Next(nCenter);
        xCoordinate = center[r, 0];
@@ -201,7 +205,7 @@ public class TerrainMap : Game {
            else
                zCoordinate -= step;
 
-           if (xCoordinate < 0 || xCoordinate > textureWidth || zCoordinate < 0 || zCoordinate > textureHeight) {
+           if (xCoordinate < 0 || xCoordinate >= textureWidth || zCoordinate < 0 || zCoordinate >= textureHeight) {
                 r = random.Next(nCenter);
                 xCoordinate = center[r, 0];
                 zCoordinate = center[r, 1];
@@ -211,7 +215,7 @@ public class TerrainMap : Game {
        for (int x = 0; x < textureWidth; x++)
            for (int z = 0; z < textureHeight; z++)
            {
-               height = (float)heightMap2[x, z] / 255.0f;  // convert to grayscale 0.0 to 255.0f
+               height = heightMap2[x, z] / 255.0f;  // convert to grayscale 0.0 to 255.0f
                heightMap[x, z] =
                   new Color(new Vector3(height, height, height));
            }   
@@ -232,56 +236,6 @@ public class TerrainMap : Game {
        newTexture.SetData<Color>(textureMap1D);
        return newTexture;
    }
-   private Texture2D createHeightTexture2() {
-      float height;
-      Vector3 colorVec3;
-      heightMap = new Color[textureWidth, textureHeight];
-      // first create the "plain" heights
-      for (int x = 0; x < textureWidth; x++)
-         for (int z = 0; z < textureHeight; z++) {
-            height = ((float) random.Next(1))/255.0f; // float version of byte value 
-            colorVec3 = new Vector3(height, height, height);
-            heightMap[x, z] = new Color(colorVec3);
-            }
-      // Second create the pyramid with a base of 100 by 100 and a diagonal from center
-      // to edge of 141 centered at (128, 128) with a number of steps (100 / 5).  
-      // The "brick" height of each step is 20.
-      int centerX = 128;
-      int centerZ = 128;
-      int pyramidSide = 100;
-      int halfWidth = pyramidSide / 2;
-      int pyramidDiagonal = (int) Math.Sqrt(2*Math.Pow(pyramidSide, 2));
-      int brick = 20;
-      int stepSize = 5;
-      int [,] pyramidHeight = new int[pyramidSide, pyramidSide];
-      // initialize heights
-      for (int x = 0; x < pyramidSide; x++)
-         for (int z = 0; z < pyramidSide; z++) pyramidHeight[x, z] = 0;
-      // create heights for pyramid
-      for (int s = 0; s < pyramidDiagonal; s += stepSize) 
-         for (int x = s; x < pyramidSide - s; x++)
-            for (int z = s; z < pyramidSide - s; z ++) 
-               pyramidHeight[x, z] += brick;
-      // convert corresponding heightMap color to pyramidHeight equivalent color
-      for (int x = 0; x < pyramidSide; x++)
-         for (int z = 0; z < pyramidSide; z++) {
-            height = pyramidHeight[x, z]/255.0f;  // convert to grayscale 0.0 to 255.0f
-            heightMap[centerX - halfWidth + x, centerZ - halfWidth + z] = 
-               new Color(new Vector3(height, height, height));  
-            }   
-      // convert heightMap[,] to textureMap1D[]
-      textureMap1D = new Color[textureWidth * textureHeight];
-      int i = 0;
-      for (int x = 0; x < textureWidth; x++)
-         for (int z = 0; z < textureHeight; z++) {
-            textureMap1D[i] = heightMap[x, z];
-            i++;
-         }      
-      // create the texture to return.       
-      Texture2D newTexture = new Texture2D(device, textureWidth, textureHeight); 
-      newTexture.SetData<Color>(textureMap1D);
-      return newTexture;
-      }
 
    /// <summary>
    /// Create a color texture that will be used to "color" the terrain.
@@ -307,16 +261,16 @@ public class TerrainMap : Game {
          for (int z = 0; z < textureHeight; z++) {
             if (heightMap[x, z].R < grassHeight) // make random grass
                   switch (random.Next(3)) { 
-                     case 0 : colorVec4 = new Color(0, 100, 0, 255).ToVector4(); break;  // Color.DarkGreen
-                     case 1 : colorVec4 = Color.Green.ToVector4();     break;
+                     case 0 : colorVec4 = new Color(0, 0, 0, 255).ToVector4(); break;  // Color.DarkGreen
+                     case 1 : colorVec4 = Color.HotPink.ToVector4();     break;
                      case 2 : colorVec4 = Color.OliveDrab.ToVector4(); break;
                      }
                // color the pyramid based on height
-            else if (heightMap[x, z].R <  50) colorVec4 = Color.Brown.ToVector4();
-            else if (heightMap[x, z].R <  90) colorVec4 = Color.Tan.ToVector4();
-            else if (heightMap[x, z].R < 130) colorVec4 = Color.DarkGray.ToVector4();
-            else if (heightMap[x, z].R < 170) colorVec4 = Color.LightGray.ToVector4();
-            else colorVec4 = Color.White.ToVector4();                    
+            else if (heightMap[x, z].R <  50) colorVec4 = Color.Yellow.ToVector4();
+            else if (heightMap[x, z].R <  90) colorVec4 = Color.Green.ToVector4();
+            else if (heightMap[x, z].R < 130) colorVec4 = Color.White.ToVector4();
+            else if (heightMap[x, z].R < 170) colorVec4 = Color.GreenYellow.ToVector4();
+            else colorVec4 = Color.MediumOrchid.ToVector4();                    
          // add some noise to the color
          colorVec4 = colorVec4 + new Vector4((float) (random.NextDouble() / 20.0));
          colorMap[x, z] = new Color(colorVec4);
@@ -374,7 +328,7 @@ public class TerrainMap : Game {
       base.Draw(gameTime);
       }
 
-   static void Main2(string[] args) {
+   static void Main(string[] args) {
       using (TerrainMap game = new TerrainMap()) {
          game.Run(); }
          } 
