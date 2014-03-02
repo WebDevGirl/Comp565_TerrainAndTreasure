@@ -75,6 +75,11 @@
       <Importer>XImporter</Importer>
       <Processor>ModelProcessor</Processor>
     </Compile>
+    <Compile Include="sphere.x">
+      <Name>sphere</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
     <Compile Include="templeV3.x">
       <Name>templeV3</Name>
       <Importer>XImporter</Importer>

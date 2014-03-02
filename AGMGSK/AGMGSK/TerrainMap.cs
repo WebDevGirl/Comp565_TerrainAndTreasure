@@ -192,7 +192,7 @@ public class TerrainMap : Game {
        for (int k = 0; k < 10000; k++) {
            for (int x = xCoordinate - radius; x <= xCoordinate + radius; x++)
                for (int z = zCoordinate - radius; z <= zCoordinate + radius; z++)
-                    if (x >= 0 && x < textureWidth && z >= 0 && z < textureHeight)
+                    if (x >= 20 && x < textureWidth - 20 && z >= 20 && z < textureHeight - 20)
                        heightMap2[x, z]+= 1;
            int first = random.Next(2);
            int second = random.Next(2);
@@ -328,7 +328,7 @@ public class TerrainMap : Game {
       base.Draw(gameTime);
       }
 
-   static void Main(string[] args) {
+   static void Main2(string[] args) {
       using (TerrainMap game = new TerrainMap()) {
          game.Run(); }
          } 

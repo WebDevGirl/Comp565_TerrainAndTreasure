@@ -377,7 +377,8 @@ public class Stage : Game {
       Components.Add(m3d);
 
       // Add Treasure To Map
-      Treasure tr = new Treasure(this, "t1", "templeV3");
+      Model3D tr = new Treasure(this, "t1", "sphere");
+      tr.IsCollidable = true;
       tr.addObject(new Vector3(500 * spacing, terrain.surfaceHeight(500, 500), 500 * spacing),
           new Vector3(0, 1, 0), 0.79f);
       Components.Add(tr);
@@ -511,7 +512,7 @@ public class Stage : Game {
     /// <summary>
    /// The main entry point for the application.
    /// </summary>
-   static void Main2(string[] args)
+   static void Main(string[] args)
    {
        using (Stage stage = new Stage()) { stage.Run(); }
    }
