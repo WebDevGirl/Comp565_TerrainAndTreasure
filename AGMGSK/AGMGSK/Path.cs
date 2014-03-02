@@ -46,8 +46,8 @@ namespace AGMGSK {
 public class Path : DrawableGameComponent {
    public enum PathType  {SINGLE, REVERSE, LOOP};
    private List<NavNode> node;
-   private int nextNode;
-   private PathType pathType;
+   public int nextNode;
+   public PathType pathType;
    private bool done;
    private Stage stage;
 

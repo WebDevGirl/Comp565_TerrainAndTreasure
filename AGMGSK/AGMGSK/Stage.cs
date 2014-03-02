@@ -103,6 +103,8 @@ public class Stage : Game {
    protected double fpsSecond;
    protected int draws, updates;
 
+   protected List<Treasure> treasures = new List<Treasure>();
+
    /// <summary>
    /// Set the Scene.
    /// The Scene contains all "application-specific" content that is to added to
@@ -378,9 +380,19 @@ public class Stage : Game {
 
       // Add Treasure To Map
       Treasure tr = new Treasure(this, "t1", "templeV3");
-      tr.addObject(new Vector3(500 * spacing, terrain.surfaceHeight(500, 500), 500 * spacing),
+      tr.addObject(new Vector3(450 * spacing, terrain.surfaceHeight(450, 500), 500 * spacing),
           new Vector3(0, 1, 0), 0.79f);
       Components.Add(tr);
+
+      treasures.Add(tr);
+
+      tr = new Treasure(this, "t1", "templeV3");
+      tr.addObject(new Vector3(380 * spacing, terrain.surfaceHeight(380, 500), 500 * spacing),
+          new Vector3(0, 1, 0), 0.79f);
+      Components.Add(tr);
+
+      treasures.Add(tr);
+
 
       // create walls for obstacle avoidance or path finding algorithms
       Wall wall = new Wall(this, "wall", "100x100x100Brick");
@@ -473,11 +485,15 @@ public class Stage : Game {
       else if (keyboardState.IsKeyDown(Keys.M) && !oldKeyboardState.IsKeyDown(Keys.M)) {
          inspector.ShowMatrices = ! inspector.ShowMatrices;
          inspector.ShowHelp = false; }
+      // switch npAgent's navigation mode
+      else if (keyboardState.IsKeyDown(Keys.N) && !oldKeyboardState.IsKeyDown(Keys.N)) {
+          npAgent.switchMode(treasures);
+      }
       // toggle update speed between FixedStep and ! FixedStep
       else if (keyboardState.IsKeyDown(Keys.T) && !oldKeyboardState.IsKeyDown(Keys.T))
-         FixedStepRendering = ! FixedStepRendering;
+          FixedStepRendering = !FixedStepRendering;
       else if (keyboardState.IsKeyDown(Keys.Y) && !oldKeyboardState.IsKeyDown(Keys.Y))
-         YonFlag = ! YonFlag;  // toggle Yon clipping value.
+          YonFlag = !YonFlag;  // toggle Yon clipping value.
       oldKeyboardState = keyboardState;    // Update saved state.
       base.Update(gameTime);  // update all GameComponents and DrawableGameComponents
       currentCamera.updateViewMatrix();

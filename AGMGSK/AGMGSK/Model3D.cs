@@ -138,7 +138,7 @@ public class Model3D : DrawableGameComponent {
    /// <param name="orientAxis"> axis of rotation</param>
    /// <param name="radians"> rotation on orientAxis</param>
    /// <returns> the new Object3D</returns>
-   public Object3D addObject(Vector3 position, Vector3 orientAxis, float radians) {
+   public virtual Object3D addObject(Vector3 position, Vector3 orientAxis, float radians) {
       Object3D obj3d = new Object3D(stage, this, String.Format("{0}.{1}", name, instance.Count), 
          position, orientAxis, radians, Vector3.One);
       obj3d.updateBoundingSphere();  // need to do only once for Model3D

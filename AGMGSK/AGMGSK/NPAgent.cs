@@ -25,6 +25,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 #if ! __XNA4__  // when __XNA4__ == true build for MonoGames
    using Microsoft.Xna.Framework.Storage; 
 #endif
@@ -46,9 +47,14 @@ namespace AGMGSK {
 
 public class NPAgent : Agent {
    private NavNode nextGoal;
+   private NavNode savedGoal;
    private Path path;
+   private Path terrian_path; 
+   private Path treasure_path;
+   private Path savedPath;
    private int snapDistance = 20;
    private int turnCount = 0;
+   private int mode = 0;
 
 
    /// <summary>
@@ -70,11 +76,85 @@ public class NPAgent : Agent {
       follow.Name = "npFollow";
       above.Name =  "npAbove";
       // path is built to work on specific terrain
-      path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
-      stage.Components.Add(path);
+      terrian_path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
+      stage.Components.Add(terrian_path);
+      
+
+      path = terrian_path;
       nextGoal = path.NextNode;  // get first path goal
       agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
-      }   
+      }
+
+   /// <summary>
+   /// Switch the npAgent's navigation mode to either treasure or path finding
+   /// </summary>
+   /// <returns></returns>
+   public void switchMode(List<Treasure> treasures)
+   {
+       mode = (mode + 1) % 2;
+       switch (mode)
+       {
+           case 0: // Switch to Mode: Path Finding
+               Debug.WriteLine("Switch To Mode: Path Finding");
+               path = terrian_path;
+               nextGoal = savedGoal;
+               agentObject.turnToFace(nextGoal.Translation);
+               break;
+           case 1: // Switch to Mode: Treasure Finding
+               Debug.WriteLine("Switch To Mode: Treasure Finding");
+               savedGoal = nextGoal;
+
+               treasure_path = new Path(stage, chooseClosestTreasure(treasures), Path.PathType.LOOP);
+               stage.Components.Add(treasure_path);
+              
+               path = treasure_path;
+               nextGoal = path.NextNode;
+               agentObject.turnToFace(nextGoal.Translation);
+
+               break;
+           default:
+               Debug.WriteLine("Bad Toggle Mode");
+               break;
+       }
+
+   }
+   
+   /// <summary>
+   /// Procedurally make a path for NPAgent to traverse
+   /// </summary>
+   /// <returns></returns>
+   private List<NavNode> chooseClosestTreasure(List<Treasure> treasures)
+   {
+       float distance = 0;
+       float minDistance = 10000000000000000;
+       Treasure minTreasure = treasures[0];
+       
+      
+       /* Find Treasure that is closest to npAgent */ 
+       foreach (Treasure treasure in treasures)
+       {
+           
+           distance = Vector3.Distance(
+                treasure.position,
+                new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
+           
+           Debug.WriteLine("distance = " + distance);
+
+            if (distance < minDistance)
+            {
+                minTreasure = treasure;
+                minDistance = distance;
+            }
+
+       }
+       
+       /* Set Treasure Path */
+       List<NavNode> aPath = new List<NavNode>();
+       aPath.Add(new NavNode(minTreasure.position,
+                NavNode.NavNodeEnum.WAYPOINT));
+  
+       return (aPath);
+   }
 
    /// <summary>
    /// Procedurally make a path for NPAgent to traverse
@@ -119,6 +199,7 @@ public class NPAgent : Agent {
       return(aPath);
    }
 
+
    /// <summary>
    /// Simple path following.  If within "snap distance" of a the nextGoal (a NavNode) 
    /// move to the NavNode, get a new nextGoal, turnToFace() that goal.  Otherwise 
@@ -135,7 +216,10 @@ public class NPAgent : Agent {
       float distance = Vector3.Distance(
          new Vector3(nextGoal.Translation.X, 0, nextGoal.Translation.Z), 
          new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
-      if (distance  <= snapDistance)  {  
+      stage.setInfo(17, string.Format("Next Node = {0}", path.nextNode));
+       
+       if (distance <= snapDistance)
+      {  
          stage.setInfo(17, string.Format("distance to goal = {0,5:f2}", distance));
          // snap to nextGoal and orient toward the new nextGoal 
          nextGoal = path.NextNode;
