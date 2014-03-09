@@ -32,205 +32,211 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.GamerServices;
 #endregion
 
-namespace AGMGSK {
+namespace AGMGSK
+{
 
-/// <summary>
-/// A non-playing character that moves.  Override the inherited Update(GameTime)
-/// to implement a movement (strategy?) algorithm.
-/// Distribution NPAgent moves along an "exploration" path that is created by
-/// method makePath().  The exploration path is traversed in a reverse path loop.
-/// Paths can also be specified in text files of Vector3 values, see alternate
-/// Path class constructor.
-/// 
-/// 2/2/2014 last changed
-/// </summary>
+    /// <summary>
+    /// A non-playing character that moves.  Override the inherited Update(GameTime)
+    /// to implement a movement (strategy?) algorithm.
+    /// Distribution NPAgent moves along an "exploration" path that is created by
+    /// method makePath().  The exploration path is traversed in a reverse path loop.
+    /// Paths can also be specified in text files of Vector3 values, see alternate
+    /// Path class constructor.
+    /// 
+    /// 2/2/2014 last changed
+    /// </summary>
 
-public class NPAgent : Agent {
-   private NavNode nextGoal;
-   private NavNode savedGoal;
-   private Path path;
-   private Path terrian_path; 
-   private Path treasure_path;
-   private Path savedPath;
-   private int snapDistance = 20;
-   private int turnCount = 0;
-   private int mode = 0;
+    public class NPAgent : Agent
+    {
+        private NavNode nextGoal;
+        private NavNode savedGoal;
+        private Path path;
+        private Path terrian_path;
+        private Path treasure_path;
+        private Path savedPath;
+        private int snapDistance = 20;
+        private int turnCount = 0;
+        private int mode = 0;
 
 
-   /// <summary>
-   /// Create a NPC. 
-   /// AGXNASK distribution has npAgent move following a Path.
-   /// </summary>
-   /// <param name="theStage"> the world</param>
-   /// <param name="label"> name of </param>
-   /// <param name="pos"> initial position </param>
-   /// <param name="orientAxis"> initial rotation axis</param>
-   /// <param name="radians"> initial rotation</param>
-   /// <param name="meshFile"> Direct X *.x Model in Contents directory </param>
-   
-   public NPAgent(Stage theStage, string label, Vector3 pos, Vector3 orientAxis, 
-      float radians, string meshFile)
-      : base(theStage, label, pos, orientAxis, radians, meshFile)
-      {  // change names for on-screen display of current camera
-      first.Name =  "npFirst";
-      follow.Name = "npFollow";
-      above.Name =  "npAbove";
-      // path is built to work on specific terrain
-      terrian_path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
-      stage.Components.Add(terrian_path);
-      
+        /// <summary>
+        /// Create a NPC. 
+        /// AGXNASK distribution has npAgent move following a Path.
+        /// </summary>
+        /// <param name="theStage"> the world</param>
+        /// <param name="label"> name of </param>
+        /// <param name="pos"> initial position </param>
+        /// <param name="orientAxis"> initial rotation axis</param>
+        /// <param name="radians"> initial rotation</param>
+        /// <param name="meshFile"> Direct X *.x Model in Contents directory </param>
 
-      path = terrian_path;
-      nextGoal = path.NextNode;  // get first path goal
-      agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
-      }
+        public NPAgent(Stage theStage, string label, Vector3 pos, Vector3 orientAxis,
+           float radians, string meshFile)
+            : base(theStage, label, pos, orientAxis, radians, meshFile)
+        {  // change names for on-screen display of current camera
+            first.Name = "npFirst";
+            follow.Name = "npFollow";
+            above.Name = "npAbove";
+            // path is built to work on specific terrain
+            terrian_path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
+            stage.Components.Add(terrian_path);
 
-   /// <summary>
-   /// Switch the npAgent's navigation mode to either treasure or path finding
-   /// </summary>
-   /// <returns></returns>
-   public void switchMode(List<Treasure> treasures)
-   {
-       mode = (mode + 1) % 2;
-       switch (mode)
-       {
-           case 0: // Switch to Mode: Path Finding
-               Debug.WriteLine("Switch To Mode: Path Finding");
-               path = terrian_path;
-               nextGoal = savedGoal;
-               agentObject.turnToFace(nextGoal.Translation);
-               break;
-           case 1: // Switch to Mode: Treasure Finding
-               Debug.WriteLine("Switch To Mode: Treasure Finding");
-               savedGoal = nextGoal;
 
-               treasure_path = new Path(stage, chooseClosestTreasure(treasures), Path.PathType.LOOP);
-               stage.Components.Add(treasure_path);
-              
-               path = treasure_path;
-               nextGoal = path.NextNode;
-               agentObject.turnToFace(nextGoal.Translation);
+            path = terrian_path;
+            nextGoal = path.NextNode;  // get first path goal
+            agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
+        }
 
-               break;
-           default:
-               Debug.WriteLine("Bad Toggle Mode");
-               break;
-       }
-
-   }
-   
-   /// <summary>
-   /// Procedurally make a path for NPAgent to traverse
-   /// </summary>
-   /// <returns></returns>
-   private List<NavNode> chooseClosestTreasure(List<Treasure> treasures)
-   {
-       float distance = 0;
-       float minDistance = 10000000000000000;
-       Treasure minTreasure = treasures[0];
-       
-      
-       /* Find Treasure that is closest to npAgent */ 
-       foreach (Treasure treasure in treasures)
-       {
-           
-           distance = Vector3.Distance(
-                treasure.position,
-                new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
-           
-           Debug.WriteLine("distance = " + distance);
-
-            if (distance < minDistance)
+        /// <summary>
+        /// Switch the npAgent's navigation mode to either treasure or path finding
+        /// </summary>
+        /// <returns></returns>
+        public void switchMode(List<Treasure> treasures)
+        {
+            mode = (mode + 1) % 2;
+            switch (mode)
             {
-                minTreasure = treasure;
-                minDistance = distance;
+                case 0: // Switch to Mode: Path Finding
+                    Debug.WriteLine("Switch To Mode: Path Finding");
+                    path = terrian_path;
+                    nextGoal = savedGoal;
+                    agentObject.turnToFace(nextGoal.Translation);
+                    break;
+                case 1: // Switch to Mode: Treasure Finding
+                    Debug.WriteLine("Switch To Mode: Treasure Finding");
+                    savedGoal = nextGoal;
+
+                    treasure_path = new Path(stage, chooseClosestTreasure(treasures), Path.PathType.LOOP);
+                    stage.Components.Add(treasure_path);
+
+                    path = treasure_path;
+                    nextGoal = path.NextNode;
+                    agentObject.turnToFace(nextGoal.Translation);
+
+                    break;
+                default:
+                    Debug.WriteLine("Bad Toggle Mode");
+                    break;
             }
 
-       }
-       
-       /* Set Treasure Path */
-       List<NavNode> aPath = new List<NavNode>();
-       aPath.Add(new NavNode(minTreasure.position,
-                NavNode.NavNodeEnum.WAYPOINT));
-  
-       return (aPath);
-   }
+        }
 
-   /// <summary>
-   /// Procedurally make a path for NPAgent to traverse
-   /// </summary>
-   /// <returns></returns>
-   private List<NavNode> makePath() {
-      List<NavNode> aPath = new List<NavNode>();
-      int spacing = stage.Spacing;
-      // make a simple path, show how to set the type of the NavNode outside of construction.
-      NavNode n;   
-      // path section near Player for testing 
-      n = new NavNode(new Vector3(505 * spacing, stage.Terrain.surfaceHeight(505, 505), 505 * spacing));
-      n.Navigatable = NavNode.NavNodeEnum.PATH;
-      aPath.Add(n);
-      n = new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 500), 500 * spacing));
-      n.Navigatable = NavNode.NavNodeEnum.VERTEX;
-      aPath.Add(n);
-      aPath.Add(new NavNode(new Vector3(495 * spacing, stage.Terrain.surfaceHeight(495, 495), 495 * spacing),
-               NavNode.NavNodeEnum.A_STAR));
-      aPath.Add(new NavNode(new Vector3(495 * spacing, stage.Terrain.surfaceHeight(495, 505), 505 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      aPath.Add(new NavNode(new Vector3(383 * spacing, stage.Terrain.surfaceHeight(383, 500), 500 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));   
-      // go by wall   
-      aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));      
-      aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      // turning circle 
-      aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105,495), 495 * spacing),
-               NavNode.NavNodeEnum.WAYPOINT));
-      return(aPath);
-   }
+        /// <summary>
+        /// Procedurally make a path for NPAgent to traverse
+        /// </summary>
+        /// <returns></returns>
+        private List<NavNode> chooseClosestTreasure(List<Treasure> treasures)
+        {
+            float distance = 0;
+            float minDistance = 10000000000000000;
+            Treasure minTreasure = treasures[0];
 
 
-   /// <summary>
-   /// Simple path following.  If within "snap distance" of a the nextGoal (a NavNode) 
-   /// move to the NavNode, get a new nextGoal, turnToFace() that goal.  Otherwise 
-   /// continue making steps towards the nextGoal.
-   /// </summary>
-   public override void Update(GameTime gameTime) {
-      stage.setInfo(15,  
-         string.Format("npAvatar:  Location ({0:f0},{1:f0},{2:f0})  Looking at ({3:f2},{4:f2},{5:f2})",
-            agentObject.Translation.X, agentObject.Translation.Y, agentObject.Translation.Z,
-            agentObject.Forward.X, agentObject.Forward.Y, agentObject.Forward.Z));
-      stage.setInfo(16,
-         string.Format("nextGoal:  ({0:f0},{1:f0},{2:f0})", nextGoal.Translation.X, nextGoal.Translation.Y, nextGoal.Translation.Z) );
-      // See if at or close to nextGoal, distance measured in the flat XZ plane
-      float distance = Vector3.Distance(
-         new Vector3(nextGoal.Translation.X, 0, nextGoal.Translation.Z), 
-         new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
-      stage.setInfo(17, string.Format("Next Node = {0}", path.nextNode));
-       
-       if (distance <= snapDistance)
-      {  
-         stage.setInfo(17, string.Format("distance to goal = {0,5:f2}", distance));
-         // snap to nextGoal and orient toward the new nextGoal 
-         nextGoal = path.NextNode;
-         agentObject.turnToFace(nextGoal.Translation);
-         if (path.Done)
-               stage.setInfo(18, "path traversal is done");
-            else {
-               turnCount++;
-               stage.setInfo(18, string.Format("turnToFace count = {0}", turnCount) ); }
-         }
-      base.Update(gameTime);  // Agent's Update();
-      }
-   } 
+            /* Find Treasure that is closest to npAgent */
+            foreach (Treasure treasure in treasures)
+            {
+
+                distance = Vector3.Distance(
+                     treasure.position,
+                     new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
+
+                Debug.WriteLine("distance = " + distance);
+
+                if (distance < minDistance)
+                {
+                    minTreasure = treasure;
+                    minDistance = distance;
+                }
+
+            }
+
+            /* Set Treasure Path */
+            List<NavNode> aPath = new List<NavNode>();
+            aPath.Add(new NavNode(minTreasure.position,
+                     NavNode.NavNodeEnum.PATH));
+
+            return (aPath);
+        }
+
+        /// <summary>
+        /// Procedurally make a path for NPAgent to traverse
+        /// </summary>
+        /// <returns></returns>
+        private List<NavNode> makePath()
+        {
+            List<NavNode> aPath = new List<NavNode>();
+            int spacing = stage.Spacing;
+            // make a simple path, show how to set the type of the NavNode outside of construction.
+            NavNode n;
+            // path section near Player for testing 
+            n = new NavNode(new Vector3(505 * spacing, stage.Terrain.surfaceHeight(505, 505), 505 * spacing));
+            n.Navigatable = NavNode.NavNodeEnum.PATH;
+            aPath.Add(n);
+            n = new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 500), 500 * spacing));
+            n.Navigatable = NavNode.NavNodeEnum.VERTEX;
+            aPath.Add(n);
+            aPath.Add(new NavNode(new Vector3(495 * spacing, stage.Terrain.surfaceHeight(495, 495), 495 * spacing),
+                     NavNode.NavNodeEnum.A_STAR));
+            aPath.Add(new NavNode(new Vector3(495 * spacing, stage.Terrain.surfaceHeight(495, 505), 505 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(383 * spacing, stage.Terrain.surfaceHeight(383, 500), 500 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            // go by wall   
+            aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            // turning circle 
+            aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            return (aPath);
+        }
+
+
+        /// <summary>
+        /// Simple path following.  If within "snap distance" of a the nextGoal (a NavNode) 
+        /// move to the NavNode, get a new nextGoal, turnToFace() that goal.  Otherwise 
+        /// continue making steps towards the nextGoal.
+        /// </summary>
+        public override void Update(GameTime gameTime)
+        {
+            stage.setInfo(15,
+               string.Format("npAvatar:  Location ({0:f0},{1:f0},{2:f0})  Looking at ({3:f2},{4:f2},{5:f2})",
+                  agentObject.Translation.X, agentObject.Translation.Y, agentObject.Translation.Z,
+                  agentObject.Forward.X, agentObject.Forward.Y, agentObject.Forward.Z));
+            stage.setInfo(16,
+               string.Format("nextGoal:  ({0:f0},{1:f0},{2:f0})", nextGoal.Translation.X, nextGoal.Translation.Y, nextGoal.Translation.Z));
+            // See if at or close to nextGoal, distance measured in the flat XZ plane
+            float distance = Vector3.Distance(
+               new Vector3(nextGoal.Translation.X, 0, nextGoal.Translation.Z),
+               new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
+            stage.setInfo(17, string.Format("Next Node = {0}", path.nextNode));
+
+            if (distance <= snapDistance)
+            {
+                stage.setInfo(17, string.Format("distance to goal = {0,5:f2}", distance));
+                // snap to nextGoal and orient toward the new nextGoal 
+                nextGoal = path.NextNode;
+                agentObject.turnToFace(nextGoal.Translation);
+                if (path.Done)
+                    stage.setInfo(18, "path traversal is done");
+                else
+                {
+                    turnCount++;
+                    stage.setInfo(18, string.Format("turnToFace count = {0}", turnCount));
+                }
+            }
+            base.Update(gameTime);  // Agent's Update();
+        }
+    }
 }

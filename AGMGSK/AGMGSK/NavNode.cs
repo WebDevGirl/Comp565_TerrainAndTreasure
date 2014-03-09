@@ -31,88 +31,102 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.GamerServices;
 #endregion
 
-namespace AGMGSK {
-   
-/// <summary>
-/// A WayPoint or Marker to be used in path following or path finding.
-/// Four types of WAYPOINT:
-/// <list type="number"> VERTEX, a terrain vertex </list>
-/// <list type="number"> WAYPOINT, a node to follow in a path</list>
-/// <list type="number"> A_STAR, a node in an A* open or closed set </list>
-/// <list type="number"> PATH, a node in a found path (result of A*) </list> 
-/// 
-/// 2/14/2012  last update
-/// </summary>
-public class NavNode : IComparable<NavNode> {
-   public enum NavNodeEnum { VERTEX, WAYPOINT, A_STAR, PATH };
-   private double distance;  // can be used with A* path finding.
-   private Vector3 translation;
-   private NavNodeEnum navigatable;
-   private Vector3 nodeColor;
+namespace AGMGSK
+{
 
-// constructors
+    /// <summary>
+    /// A WayPoint or Marker to be used in path following or path finding.
+    /// Four types of WAYPOINT:
+    /// <list type="number"> VERTEX, a terrain vertex </list>
+    /// <list type="number"> WAYPOINT, a node to follow in a path</list>
+    /// <list type="number"> A_STAR, a node in an A* open or closed set </list>
+    /// <list type="number"> PATH, a node in a found path (result of A*) </list> 
+    /// 
+    /// 2/14/2012  last update
+    /// </summary>
+    public class NavNode : IComparable<NavNode>
+    {
+        public enum NavNodeEnum { VERTEX, WAYPOINT, A_STAR, PATH };
+        private double distance;  // can be used with A* path finding.
+        private Vector3 translation;
+        private NavNodeEnum navigatable;
+        private Vector3 nodeColor;
 
-   /// <summary>
-   /// Make a VERTEX NavNode
-   /// </summary>
-   /// <param name="pos"> location of WAYPOINT</param>
-   public NavNode(Vector3 pos) {
-      translation = pos;
-      Navigatable = NavNodeEnum.VERTEX;
-      }
+        // constructors
 
-   /// <summary>
-   /// Make a WAYPOINT and set its Navigational type
-   /// </summary>
-   /// <param name="pos"> location of WAYPOINT</param>
-   /// <param name="nType"> Navigational type {VERTEX, WAYPOINT, A_STAR, PATH} </param>
-   public NavNode(Vector3 pos, NavNodeEnum nType) {
-      translation = pos;
-      Navigatable = nType;
-      }
+        /// <summary>
+        /// Make a VERTEX NavNode
+        /// </summary>
+        /// <param name="pos"> location of WAYPOINT</param>
+        public NavNode(Vector3 pos)
+        {
+            translation = pos;
+            Navigatable = NavNodeEnum.VERTEX;
+        }
 
-// properties
+        /// <summary>
+        /// Make a WAYPOINT and set its Navigational type
+        /// </summary>
+        /// <param name="pos"> location of WAYPOINT</param>
+        /// <param name="nType"> Navigational type {VERTEX, WAYPOINT, A_STAR, PATH} </param>
+        public NavNode(Vector3 pos, NavNodeEnum nType)
+        {
+            translation = pos;
+            Navigatable = nType;
+        }
 
-   public Vector3 NodeColor {
-      get { return nodeColor; }}
+        // properties
 
-   public Double Distance {
-      get { return distance; }
-      set { distance = value; }
-      }
+        public Vector3 NodeColor
+        {
+            get { return nodeColor; }
+        }
 
-   /// <summary>
-   /// When changing the Navigatable type the WAYPOINT's nodeColor is 
-   /// also updated.
-   /// </summary>
-   public NavNodeEnum Navigatable {
-      get { return navigatable; }
-      set { navigatable = value; 
-            switch (navigatable) {
-               case NavNodeEnum.VERTEX : nodeColor = Color.Yellow.ToVector3(); break;  // yellow
-               case NavNodeEnum.WAYPOINT    : nodeColor = Color.Red.ToVector3();    break;  // red
-               case NavNodeEnum.A_STAR  : nodeColor = Color.Blue.ToVector3();   break;  // blue
-               case NavNodeEnum.PATH   : nodeColor = Color.White.ToVector3();  break;  // white
-               }
-            }} 
+        public Double Distance
+        {
+            get { return distance; }
+            set { distance = value; }
+        }
 
-   public Vector3 Translation {
-      get { return translation; }
-      }
+        /// <summary>
+        /// When changing the Navigatable type the WAYPOINT's nodeColor is 
+        /// also updated.
+        /// </summary>
+        public NavNodeEnum Navigatable
+        {
+            get { return navigatable; }
+            set
+            {
+                navigatable = value;
+                switch (navigatable)
+                {
+                    case NavNodeEnum.VERTEX: nodeColor = Color.Yellow.ToVector3(); break;  // yellow
+                    case NavNodeEnum.WAYPOINT: nodeColor = Color.Red.ToVector3(); break;  // red
+                    case NavNodeEnum.A_STAR: nodeColor = Color.Blue.ToVector3(); break;  // blue
+                    case NavNodeEnum.PATH: nodeColor = Color.White.ToVector3(); break;  // white
+                }
+            }
+        }
 
-// methods
+        public Vector3 Translation
+        {
+            get { return translation; }
+        }
 
-   /// <summary>
-   /// Useful in A* path finding 
-   /// when inserting into an min priority queue open set ordered on distance
-   /// </summary>
-   /// <param name="n"> goal node </param>
-   /// <returns> usual comparison values:  -1, 0, 1 </returns>
-   public int CompareTo(NavNode n) {
-      if (distance < n.Distance)       return -1;
-      else if (distance > n.Distance)  return  1;
-      else                             return  0;
-      }
-      
-   }
+        // methods
+
+        /// <summary>
+        /// Useful in A* path finding 
+        /// when inserting into an min priority queue open set ordered on distance
+        /// </summary>
+        /// <param name="n"> goal node </param>
+        /// <returns> usual comparison values:  -1, 0, 1 </returns>
+        public int CompareTo(NavNode n)
+        {
+            if (distance < n.Distance) return -1;
+            else if (distance > n.Distance) return 1;
+            else return 0;
+        }
+
+    }
 }
