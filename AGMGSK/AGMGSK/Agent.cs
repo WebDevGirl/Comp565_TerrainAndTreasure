@@ -49,6 +49,7 @@ namespace AGMGSK
         protected Object3D agentObject = null;
         protected Camera agentCamera, first, follow, above;
         public enum CameraCase { FirstCamera, FollowCamera, AboveCamera }
+        protected int treasuresTagged;
 
 
         /// <summary>
@@ -83,6 +84,12 @@ namespace AGMGSK
         public Object3D AgentObject
         {
             get { return agentObject; }
+        }
+
+        public int TreasuresTagged
+        {
+            get { return treasuresTagged; }
+            set { treasuresTagged = value; }
         }
 
         public Camera AvatarCamera

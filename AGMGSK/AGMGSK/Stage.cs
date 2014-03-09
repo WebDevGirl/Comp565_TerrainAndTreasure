@@ -530,11 +530,11 @@ namespace AGMGSK
                 draws = updates = 0;
                 fpsSecond = 0.0;
                 inspector.setInfo(11,
-                   string.Format("Player:   Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
+                   string.Format("Player:   Treasures Tagged   " + player.TreasuresTagged + "   Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
                    player.AgentObject.Translation.X, player.AgentObject.Translation.Y, player.AgentObject.Translation.Z,
                    player.AgentObject.Forward.X, player.AgentObject.Forward.Y, player.AgentObject.Forward.Z));
                 inspector.setInfo(12,
-                   string.Format("npAgent:  Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
+                   string.Format("npAgent:  Treasures Tagged   " + npAgent.TreasuresTagged + "   Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
                    npAgent.AgentObject.Translation.X, npAgent.AgentObject.Translation.Y, npAgent.AgentObject.Translation.Z,
                    npAgent.AgentObject.Forward.X, npAgent.AgentObject.Forward.Y, npAgent.AgentObject.Forward.Z));
                 inspector.setMatrices("player", "npAgent", player.AgentObject.Orientation, npAgent.AgentObject.Orientation);
@@ -590,7 +590,7 @@ namespace AGMGSK
         {
             draws++;
             display.Viewport = defaultViewport; //sceneViewport;
-            display.Clear(Color.CornflowerBlue);
+            display.Clear(Color.Black);
             // Draw into inspectorViewport
             display.Viewport = inspectorViewport;
             spriteBatch.Begin();
@@ -610,14 +610,14 @@ namespace AGMGSK
         {
             for (int i = 0; i < treasures.Count; i++)
             {
-                String tagger = null;
+                Agent tagger = null;
                 if (!treasures[i].IsTagged && player.withinRange(treasures[i], 2000))
                 {
-                    tagger = player.GetType().Name;
+                    tagger = player;
                 }
                 else if (!treasures[i].IsTagged && npAgent.withinRange(treasures[i], 2000))
                 {
-                    tagger = npAgent.GetType().Name;
+                    tagger = npAgent;
                 }
 
                 if (tagger != null)

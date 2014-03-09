@@ -34,10 +34,11 @@ namespace AGMGSK
 
         }
 
-        public void SetTagged(String agent)
+        public void SetTagged(Agent agent)
         {
             this.isTagged = true;
-            Debug.WriteLine(agent + " tagged the treasure!");
+            agent.TreasuresTagged++;
+            Debug.WriteLine(agent.GetType().Name + " tagged the treasure!");
         }
 
     }

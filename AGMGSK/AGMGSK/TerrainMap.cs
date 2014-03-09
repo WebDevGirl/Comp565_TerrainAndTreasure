@@ -274,15 +274,15 @@ namespace TerrainMap
                         switch (random.Next(3))
                         {
                             case 0: colorVec4 = new Color(0, 0, 0, 255).ToVector4(); break;  // Color.DarkGreen
-                            case 1: colorVec4 = Color.HotPink.ToVector4(); break;
-                            case 2: colorVec4 = Color.OliveDrab.ToVector4(); break;
+                            case 1: colorVec4 = Color.Black.ToVector4(); break;
+                            case 2: colorVec4 = Color.LightGreen.ToVector4(); break;
                         }
                     // color the pyramid based on height
-                    else if (heightMap[x, z].R < 50) colorVec4 = Color.Yellow.ToVector4();
-                    else if (heightMap[x, z].R < 90) colorVec4 = Color.Green.ToVector4();
-                    else if (heightMap[x, z].R < 130) colorVec4 = Color.White.ToVector4();
-                    else if (heightMap[x, z].R < 170) colorVec4 = Color.GreenYellow.ToVector4();
-                    else colorVec4 = Color.MediumOrchid.ToVector4();
+                    else if (heightMap[x, z].R < 50) colorVec4 = Color.Black.ToVector4();
+                    else if (heightMap[x, z].R < 90) colorVec4 = Color.LightSkyBlue.ToVector4();
+                    else if (heightMap[x, z].R < 130) colorVec4 = Color.Black.ToVector4();
+                    else if (heightMap[x, z].R < 170) colorVec4 = Color.DarkBlue.ToVector4();
+                    else colorVec4 = Color.White.ToVector4();
                     // add some noise to the color
                     colorVec4 = colorVec4 + new Vector4((float)(random.NextDouble() / 20.0));
                     colorMap[x, z] = new Color(colorVec4);
