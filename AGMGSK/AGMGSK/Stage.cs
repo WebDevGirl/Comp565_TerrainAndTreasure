@@ -610,13 +610,20 @@ namespace AGMGSK
         {
             for (int i = 0; i < treasures.Count; i++)
             {
+                String tagger = null;
                 if (!treasures[i].IsTagged && player.withinRange(treasures[i], 2000))
                 {
-                    treasures[i].SetTagged(player.GetType().Name);
+                    tagger = player.GetType().Name;
                 }
                 else if (!treasures[i].IsTagged && npAgent.withinRange(treasures[i], 2000))
                 {
-                    treasures[i].SetTagged(npAgent.GetType().Name);
+                    tagger = npAgent.GetType().Name;
+                }
+
+                if (tagger != null)
+                {
+                    treasures[i].SetTagged(tagger);
+                    treasures[i].UpdateSprite("dogV3");
                 }
             }
         }

@@ -98,6 +98,11 @@ namespace AGMGSK
             // need to scale boundingSphereRadius for each object instances in Object3D
         }
 
+        public void UpdateSprite(String name)
+        {
+            model = stage.Content.Load<Model>(name);
+        }
+
         /// <summary>
         /// Return the center of the model's bounding sphere
         /// </summary>
