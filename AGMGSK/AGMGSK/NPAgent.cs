@@ -107,12 +107,17 @@ namespace AGMGSK
                     savedGoal = nextGoal;
 
                     treasure_path = new Path(stage, chooseClosestTreasure(treasures), Path.PathType.LOOP);
-                    stage.Components.Add(treasure_path);
 
-                    path = treasure_path;
-                    nextGoal = path.NextNode;
-                    agentObject.turnToFace(nextGoal.Translation);
+                    Debug.WriteLine("tp: " + treasure_path.Count);
 
+                    if (treasure_path.Count != 0)
+                    {
+                        stage.Components.Add(treasure_path);
+                        path = treasure_path;
+                        nextGoal = path.NextNode;
+                        agentObject.turnToFace(nextGoal.Translation);
+                    }
+                                       
                     break;
                 default:
                     Debug.WriteLine("Bad Toggle Mode");
@@ -143,32 +148,40 @@ namespace AGMGSK
         {
             float distance = 0;
             float minDistance = 10000000000000000;
-            Treasure minTreasure = treasures[0];
+            Treasure minTreasure = null;
 
 
             /* Find Treasure that is closest to npAgent */
             foreach (Treasure treasure in treasures)
             {
-
-                distance = Vector3.Distance(
-                     treasure.position,
-                     new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
-
-                Debug.WriteLine("distance = " + distance);
-
-                if (distance < minDistance)
+                /* Find the closest non-tagged treasure */
+                if (treasure.IsTagged == false)
                 {
-                    minTreasure = treasure;
-                    minDistance = distance;
-                }
+                    distance = Vector3.Distance(
+                   treasure.position,
+                   new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
 
+                    Debug.WriteLine("distance = " + distance);
+
+                    if (distance < minDistance)
+                    {
+                        minTreasure = treasure;
+                        minDistance = distance;
+                    }
+                }
             }
 
-            /* Set Treasure Path */
-            List<NavNode> aPath = new List<NavNode>();
-            aPath.Add(new NavNode(minTreasure.position,
-                     NavNode.NavNodeEnum.PATH));
 
+            List<NavNode> aPath = new List<NavNode>();
+            /* Set Treasure Path */
+            if (minTreasure != null)
+            {               
+                aPath.Add(new NavNode(minTreasure.position,
+                         NavNode.NavNodeEnum.PATH));
+            } else {
+                switchModeToPathFinding();
+            }
+         
             return (aPath);
         }
 
