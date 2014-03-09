@@ -113,6 +113,14 @@ namespace AGMGSK
             agentCamera.updateViewMatrix();
         }
 
+        public Boolean withinRange(Model3D obj, int range)
+        {
+            return (this.AgentObject.Translation.X >= obj.position.X - range) &&
+                (this.AgentObject.Translation.X <= obj.position.X + range) &&
+                 (this.AgentObject.Translation.Z >= obj.position.Z - range) &&
+                    (this.AgentObject.Translation.Z <= obj.position.Z + range);
+        }
+
         public override void Update(GameTime gameTime)
         {
             agentObject.updateMovableObject();
@@ -121,6 +129,5 @@ namespace AGMGSK
             // set height to be on terrain -- this is a crude "first approximation" solution.
             stage.setSurfaceHeight(agentObject);
         }
-
     }
 }

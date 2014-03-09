@@ -575,6 +575,7 @@ namespace AGMGSK
             else if (keyboardState.IsKeyDown(Keys.Y) && !oldKeyboardState.IsKeyDown(Keys.Y))
                 YonFlag = !YonFlag;  // toggle Yon clipping value.
             oldKeyboardState = keyboardState;    // Update saved state.
+            checkForTreasure();
             base.Update(gameTime);  // update all GameComponents and DrawableGameComponents
             currentCamera.updateViewMatrix();
         }
@@ -603,6 +604,21 @@ namespace AGMGSK
             display.Viewport = sceneViewport;
             display.RasterizerState = RasterizerState.CullNone;
             base.Draw(gameTime);  // draw all GameComponents and DrawableGameComponents
+        }
+
+        public void checkForTreasure()
+        {
+            for (int i = 0; i < treasures.Count; i++)
+            {
+                if (!treasures[i].IsTagged && player.withinRange(treasures[i], 2000))
+                {
+                    treasures[i].SetTagged(player.GetType().Name);
+                }
+                else if (!treasures[i].IsTagged && npAgent.withinRange(treasures[i], 2000))
+                {
+                    treasures[i].SetTagged(npAgent.GetType().Name);
+                }
+            }
         }
 
         /// <summary>

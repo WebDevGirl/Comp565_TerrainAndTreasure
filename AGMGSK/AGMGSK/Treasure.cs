@@ -13,8 +13,7 @@ namespace AGMGSK
     public class Treasure : Model3D
     {
         protected Boolean isTagged = false;
-        protected Player taggedBy = null;
-        public Vector3 position;
+        protected String taggedBy = null;
 
 
         public Treasure(Stage theStage, string label, string meshFile)
@@ -23,11 +22,22 @@ namespace AGMGSK
             Debug.WriteLine("Creating a new treasure");
         }
 
+        public Boolean IsTagged
+        {
+            get { return isTagged; }
+        }
+
         override public Object3D addObject(Vector3 position, Vector3 orientAxis, float radians)
         {
             this.position = position;
             return base.addObject(position, orientAxis, radians);
 
+        }
+
+        public void SetTagged(String agent)
+        {
+            this.isTagged = true;
+            Debug.WriteLine(agent + " tagged the treasure!");
         }
 
     }

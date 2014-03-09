@@ -52,6 +52,7 @@ namespace AGMGSK
         protected Matrix boundingSphereWorld;
         // Model3D's object instance collection 
         protected List<Object3D> instance;
+        public Vector3 position;
 
         //   public Model3D(Stage theStage, string label, Vector3 position, Vector3 orientAxis, 
         //      float radians, string fileOfModel) : base (theStage) { 
@@ -159,6 +160,7 @@ namespace AGMGSK
             obj3d.updateBoundingSphere();  // need to do only once for Model3D
             instance.Add(obj3d);
             if (IsCollidable) stage.Collidable.Add(obj3d);
+            this.position = position;
             return obj3d;
         }
 
