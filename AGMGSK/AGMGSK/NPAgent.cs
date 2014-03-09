@@ -122,6 +122,20 @@ namespace AGMGSK
         }
 
         /// <summary>
+        /// Switch the npAgent's navigation back to path finding
+        /// </summary>
+        /// <returns></returns>
+        public void switchModeToPathFinding()
+        {
+            mode = 0;
+            Debug.WriteLine("Switch To Mode: Path Finding");
+            path = terrian_path;
+            nextGoal = savedGoal;
+            agentObject.turnToFace(nextGoal.Translation);
+
+        }
+
+        /// <summary>
         /// Procedurally make a path for NPAgent to traverse
         /// </summary>
         /// <returns></returns>
@@ -225,16 +239,21 @@ namespace AGMGSK
             if (distance <= snapDistance)
             {
                 stage.setInfo(17, string.Format("distance to goal = {0,5:f2}", distance));
-                // snap to nextGoal and orient toward the new nextGoal 
-                nextGoal = path.NextNode;
-                agentObject.turnToFace(nextGoal.Translation);
-                if (path.Done)
-                    stage.setInfo(18, "path traversal is done");
-                else
-                {
-                    turnCount++;
-                    stage.setInfo(18, string.Format("turnToFace count = {0}", turnCount));
-                }
+
+                /* Decide Next Goal */
+                if (mode == 1) {  // If on Treasure Path switch path to path finding and saved goal 
+                    switchModeToPathFinding();
+                } else {  // else snap to nextGoal and orient toward the new nextGoal 
+                    nextGoal = path.NextNode;
+                    agentObject.turnToFace(nextGoal.Translation);
+
+                    if (path.Done) {
+                        stage.setInfo(18, "path traversal is done");
+                    } else {
+                        turnCount++;
+                        stage.setInfo(18, string.Format("turnToFace count = {0}", turnCount));
+                    }
+                }                     
             }
             base.Update(gameTime);  // Agent's Update();
         }
