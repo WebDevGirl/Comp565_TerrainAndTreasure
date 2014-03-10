@@ -97,10 +97,8 @@ namespace AGMGSK
             switch (mode)
             {
                 case 0: // Switch to Mode: Path Finding
-                    Debug.WriteLine("Switch To Mode: Path Finding");
-                    path = terrian_path;
-                    nextGoal = savedGoal;
-                    agentObject.turnToFace(nextGoal.Translation);
+                    switchModeToPathFinding();
+                    restart();
                     break;
                 case 1: // Switch to Mode: Treasure Finding
                     Debug.WriteLine("Switch To Mode: Treasure Finding");
@@ -179,7 +177,7 @@ namespace AGMGSK
                 aPath.Add(new NavNode(minTreasure.position,
                          NavNode.NavNodeEnum.PATH));
             } else {
-                switchModeToPathFinding();
+                base.reset();
             }
          
             return (aPath);

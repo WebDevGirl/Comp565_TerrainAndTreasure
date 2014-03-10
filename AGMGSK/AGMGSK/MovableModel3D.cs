@@ -61,6 +61,11 @@ namespace AGMGSK
             foreach (Object3D obj in instance) obj.reset();
         }
 
+        public void restart()
+        {
+            foreach (Object3D obj in instance) obj.Step = 1;
+        }
+
         ///<summary>
         ///  pass through
         ///</summary>
