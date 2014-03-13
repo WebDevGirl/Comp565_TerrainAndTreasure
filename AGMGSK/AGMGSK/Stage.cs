@@ -450,15 +450,15 @@ namespace AGMGSK
             Components.Add(m3d);
 
             // Add Treasure To Map
-            Treasure tr = new Treasure(this, "t1", "templeV3");
-            tr.addObject(new Vector3(450 * spacing, terrain.surfaceHeight(450, 500), 500 * spacing),
+            Treasure tr = new Treasure(this, "t1", "hash");
+            tr.addObject(new Vector3(450 * spacing, terrain.surfaceHeight(450, 500) + 300, 500 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
 
             treasures.Add(tr);
 
-            tr = new Treasure(this, "t1", "templeV3");
-            tr.addObject(new Vector3(380 * spacing, terrain.surfaceHeight(380, 500), 500 * spacing),
+            tr = new Treasure(this, "t1", "hash");
+            tr.addObject(new Vector3(380 * spacing, terrain.surfaceHeight(380, 500) + 300, 500 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
 
@@ -614,11 +614,11 @@ namespace AGMGSK
             for (int i = 0; i < treasures.Count; i++)
             {
                 Agent tagger = null;
-                if (!treasures[i].IsTagged && player.withinRange(treasures[i], 2000))
+                if (!treasures[i].IsTagged && player.withinRange(treasures[i], 750))
                 {
                     tagger = player;
                 }
-                else if (!treasures[i].IsTagged && npAgent.withinRange(treasures[i], 2000))
+                else if (!treasures[i].IsTagged && npAgent.withinRange(treasures[i], 750))
                 {
                     tagger = npAgent;
                 }
@@ -627,7 +627,7 @@ namespace AGMGSK
                 {
                     treasures[i].SetTagged(tagger);
                     tagger.TreasuresTagged++;
-                    treasures[i].UpdateSprite("dogV3");
+                    treasures[i].UpdateSprite("cracked");
                 }
             }
         }
