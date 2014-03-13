@@ -339,8 +339,8 @@ namespace AGMGSK
 
         public void setSurfaceHeight(Object3D anObject3D)
         {
-            float terrainHeight = terrain.surfaceHeight((int)(anObject3D.Translation.X / spacing),
-                                                         (int)(anObject3D.Translation.Z / spacing));
+            float terrainHeight = terrain.surfaceHeight((anObject3D.Translation.X / spacing),
+                                                         (anObject3D.Translation.Z / spacing));
             anObject3D.Translation = new Vector3(anObject3D.Translation.X,
                                                   terrainHeight, anObject3D.Translation.Z);
         }
@@ -606,6 +606,9 @@ namespace AGMGSK
             base.Draw(gameTime);  // draw all GameComponents and DrawableGameComponents
         }
 
+        // Checks whether an Agent has come into contact with a treasure
+        // If it has, the treasure is tagged 
+        // and the tagging Agent's TreasuresTagged is incremented.
         public void checkForTreasure()
         {
             for (int i = 0; i < treasures.Count; i++)
@@ -623,6 +626,7 @@ namespace AGMGSK
                 if (tagger != null)
                 {
                     treasures[i].SetTagged(tagger);
+                    tagger.TreasuresTagged++;
                     treasures[i].UpdateSprite("dogV3");
                 }
             }

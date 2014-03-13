@@ -152,8 +152,8 @@ namespace TerrainMap
         /// <summary>
         /// Create a height map as a texture of byte values (0..255) 
         /// that can be viewed as a greyscale bitmap.  
-        /// The scene will have a plain of grass (heights 0..3) and
-        /// a pyramid (height > 5).
+        /// This function uses the Brownian motion algorithm
+        /// from the lecture slides to generate a terrain.
         /// </summary>
         /// <returns>height texture</returns>
 
@@ -164,19 +164,15 @@ namespace TerrainMap
 
             int step = 3;
             int radius = 10;
-            int nCenter = 2;
-            int[,] heightMap2 = new int[textureWidth, textureWidth];
+            int nCenter = 2; // Number of centers around which terrain is built
+            int[,] heightMap2 = new int[textureWidth, textureWidth]; //Create an int heightmap
 
+            // Create one center on upper-left of map and another on lower-right
             int[,] center = new int[nCenter, 2];
             center[0, 0] = 70;
             center[0, 1] = 70;
             center[1, 0] = 400;
             center[1, 1] = 400;
-            /*for (int i = 0; i < nCenter; i++)
-            {
-                center[i, 0] = random.Next(textureHeight);
-                center[i, 1] = random.Next(textureWidth);
-            }*/
 
             heightMap = new Color[textureWidth, textureHeight];
 
@@ -191,17 +187,20 @@ namespace TerrainMap
                 }
             int xCoordinate, zCoordinate, r;
 
+            // Choose a random center to start building around
             r = random.Next(nCenter);
             xCoordinate = center[r, 0];
             zCoordinate = center[r, 1];
 
-
+            // Build terrain around the radius of current coordinates
             for (int k = 0; k < 10000; k++)
             {
                 for (int x = xCoordinate - radius; x <= xCoordinate + radius; x++)
                     for (int z = zCoordinate - radius; z <= zCoordinate + radius; z++)
                         if (x >= 20 && x < textureWidth - 20 && z >= 20 && z < textureHeight - 20)
                             heightMap2[x, z] += 1;
+                
+                // Randomly walk around terrain
                 int first = random.Next(2);
                 int second = random.Next(2);
                 if (first == 0)
@@ -213,6 +212,7 @@ namespace TerrainMap
                 else
                     zCoordinate -= step;
 
+                // If we walk out of the terrain bounds, start building around another center
                 if (xCoordinate < 0 || xCoordinate >= textureWidth || zCoordinate < 0 || zCoordinate >= textureHeight)
                 {
                     r = random.Next(nCenter);
@@ -277,7 +277,6 @@ namespace TerrainMap
                             case 1: colorVec4 = Color.Black.ToVector4(); break;
                             case 2: colorVec4 = Color.LightGreen.ToVector4(); break;
                         }
-                    // color the pyramid based on height
                     else if (heightMap[x, z].R < 50) colorVec4 = Color.Black.ToVector4();
                     else if (heightMap[x, z].R < 90) colorVec4 = Color.LightSkyBlue.ToVector4();
                     else if (heightMap[x, z].R < 130) colorVec4 = Color.Black.ToVector4();

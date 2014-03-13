@@ -34,10 +34,10 @@ namespace AGMGSK
 
         }
 
+        // Sets isTagged to true and outputs the Agent who tagged the treasure
         public void SetTagged(Agent agent)
         {
             this.isTagged = true;
-            agent.TreasuresTagged++;
             Debug.WriteLine(agent.GetType().Name + " tagged the treasure!");
         }
 

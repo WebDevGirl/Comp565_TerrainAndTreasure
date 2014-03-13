@@ -120,6 +120,7 @@ namespace AGMGSK
             agentCamera.updateViewMatrix();
         }
 
+        // Checks to see if Agent is within a certain range of an object
         public Boolean withinRange(Model3D obj, int range)
         {
             return (this.AgentObject.Translation.X >= obj.position.X - range) &&

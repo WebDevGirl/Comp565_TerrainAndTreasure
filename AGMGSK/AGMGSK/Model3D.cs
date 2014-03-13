@@ -98,6 +98,7 @@ namespace AGMGSK
             // need to scale boundingSphereRadius for each object instances in Object3D
         }
 
+        // Changes a model from one image to another
         public void UpdateSprite(String name)
         {
             model = stage.Content.Load<Model>(name);

@@ -130,16 +130,51 @@ namespace AGMGSK
 
         ///<summary>
         /// Height of  surface containing position (x,z) terrain coordinates.
-        /// This method is a "stub" for the correct get code.
-        /// How would you determine a surface's height at (x,?,z) ? 
+        /// Uses the HeightMap interpolation algorithm from
+        /// XNA 3.0 Game Programming Recipes by Riemer Grootjans
         /// </summary>
         /// <param name="x"> left -- right terrain position </param>
         /// <param name="z"> forward -- backward terrain position</param>
         /// <returns> vertical height of surface containing position (x,z)</returns>
-        public float surfaceHeight(int x, int z)
+        public float surfaceHeight(float x, float z)
         {
             if (x < 0 || x > 511 || z < 0 || z > 511) return 0.0f;  // index valid ?
-            return (float)terrainHeight[x, z];
+
+            // Find relative x value
+            int xLower = (int)x;
+            int xHigher = xLower + 1;
+            float xRelative = (x - xLower) / ((float)xHigher - (float)xLower);
+
+            // Find relative z value
+            int zLower = (int)z;
+            int zHigher = zLower + 1;
+            float zRelative = (z - zLower) / ((float)zHigher - (float)zLower);
+
+            // Find minimum and maximum height values
+            int heightLxLz = terrainHeight[xLower, zLower];
+            int heightLxHz = terrainHeight[xLower, zHigher];
+            int heightHxLz = terrainHeight[xHigher, zLower];
+            int heightHxHz = terrainHeight[xHigher, zHigher];
+
+            float finalHeight;
+
+            // Determine whether the (x, z) coordinate is in the
+            // upper or lower triangle
+
+            if (xRelative + zRelative < 1) // Above lower triangle
+            {
+                finalHeight = heightLxLz;
+                finalHeight += zRelative * (heightLxHz - heightLxLz);
+                finalHeight += xRelative * (heightHxLz - heightLxLz);
+            }
+            else
+            {
+                finalHeight = heightHxHz;
+                finalHeight += (1.0f - zRelative) * (heightHxLz - heightHxHz);
+                finalHeight += (1.0f - xRelative) * (heightLxHz - heightHxHz);
+            }
+         
+            return (float)finalHeight;
         }
 
         public override void Draw(GameTime gameTime)
