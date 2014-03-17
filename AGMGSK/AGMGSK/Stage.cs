@@ -104,7 +104,7 @@ namespace AGMGSK
         // Screen display information variables
         protected double fpsSecond;
         protected int draws, updates;
-
+        // Treasures to tag
         protected List<Treasure> treasures = new List<Treasure>();
 
         /// <summary>
@@ -267,6 +267,12 @@ namespace AGMGSK
                 else setProjection(farYon);
             }
         }
+
+        public List<Treasure> Treasures
+        {
+            get { return treasures; }
+        }
+
 
         // Methods
 
@@ -445,25 +451,56 @@ namespace AGMGSK
             // create a temple
             Model3D m3d = new Model3D(this, "temple", "templeV3");
             m3d.IsCollidable = true;  // must be set before addObject(...) and Model3D doesn't set it
-            m3d.addObject(new Vector3(340 * spacing, terrain.surfaceHeight(340, 340), 340 * spacing),
+            m3d.addObject(new Vector3(200 * spacing, terrain.surfaceHeight(200, 200), 200 * spacing),
                new Vector3(0, 1, 0), 0.79f);
             Components.Add(m3d);
 
-            // Add Treasure To Map
+            // Add Treasures To Map
             Treasure tr = new Treasure(this, "t1", "hash");
-            tr.addObject(new Vector3(450 * spacing, terrain.surfaceHeight(450, 500) + 300, 500 * spacing),
+            tr.addObject(new Vector3(450 * spacing, terrain.surfaceHeight(450, 500) + 110, 500 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
-
             treasures.Add(tr);
 
-            tr = new Treasure(this, "t1", "hash");
-            tr.addObject(new Vector3(380 * spacing, terrain.surfaceHeight(380, 500) + 300, 500 * spacing),
+            tr = new Treasure(this, "t2", "hash");
+            tr.addObject(new Vector3(380 * spacing, terrain.surfaceHeight(380, 500) + 110, 500 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
-
             treasures.Add(tr);
 
+            // inside the wall, rotated to fit
+            tr = new Treasure(this, "t3", "hash");
+            tr.addObject(new Vector3(446 * spacing, terrain.surfaceHeight(446, 450) + 110, 450 * spacing),
+                new Vector3(0, 1, 0), 1.45f);
+            Components.Add(tr);
+            treasures.Add(tr);
+
+            tr = new Treasure(this, "t4", "hash");
+            tr.addObject(new Vector3(348 * spacing, terrain.surfaceHeight(348, 330) + 110, 330 * spacing),
+                new Vector3(0, 1, 0), 0.79f);
+            Components.Add(tr);
+            treasures.Add(tr);
+
+            tr = new Treasure(this, "t5", "hash");
+            tr.addObject(new Vector3(297 * spacing, terrain.surfaceHeight(297, 340) + 210, 340 * spacing),
+                new Vector3(0, 1, 0), 0.79f);
+            Components.Add(tr);
+            treasures.Add(tr);
+
+            /* Add a grid of pillars */ 
+            /* Not collidable for now because it has a HUGE bounding sphere */
+            Model3D pillar;
+            int offset = 12;           
+            for (int i = 1; i < 12; i++)
+            {
+                for (int j = 1; j < 12; j++)
+                {
+                    pillar = new Model3D(this, "p" + i, "pillar");
+                    pillar.addObject(new Vector3((250 + (offset * i)) * spacing, terrain.surfaceHeight(250 + (offset * i), 250 + (offset * j)) + 300, (250 + (offset * j)) * spacing),
+                        new Vector3(0, 1, 0), 0.79f);
+                    Components.Add(pillar);
+                }
+            }
 
             // create walls for obstacle avoidance or path finding algorithms
             Wall wall = new Wall(this, "wall", "100x100x100Brick");
@@ -567,7 +604,7 @@ namespace AGMGSK
             // switch npAgent's navigation mode
             else if (keyboardState.IsKeyDown(Keys.N) && !oldKeyboardState.IsKeyDown(Keys.N))
             {
-                npAgent.switchMode(treasures);
+                npAgent.switchMode();
             }
             // toggle update speed between FixedStep and ! FixedStep
             else if (keyboardState.IsKeyDown(Keys.T) && !oldKeyboardState.IsKeyDown(Keys.T))

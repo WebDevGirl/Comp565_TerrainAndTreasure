@@ -27,6 +27,7 @@ namespace AGMGSK
             get { return isTagged; }
         }
 
+        // store position of treasure before calling the addObject function.
         override public Object3D addObject(Vector3 position, Vector3 orientAxis, float radians)
         {
             this.position = position;

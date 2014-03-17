@@ -91,7 +91,7 @@ namespace AGMGSK
         /// Switch the npAgent's navigation mode to either treasure or path finding
         /// </summary>
         /// <returns></returns>
-        public void switchMode(List<Treasure> treasures)
+        public void switchMode()
         {
             mode = (mode + 1) % 2;
             switch (mode)
@@ -104,7 +104,7 @@ namespace AGMGSK
                     Debug.WriteLine("Switch To Mode: Treasure Finding");
                     savedGoal = nextGoal;
 
-                    treasure_path = new Path(stage, chooseClosestTreasure(treasures), Path.PathType.LOOP);
+                    treasure_path = new Path(stage, chooseClosestTreasure(stage.Treasures), Path.PathType.LOOP);
 
                     Debug.WriteLine("tp: " + treasure_path.Count);
 
@@ -139,7 +139,7 @@ namespace AGMGSK
         }
 
         /// <summary>
-        /// Procedurally make a path for NPAgent to traverse
+        /// Procedurally make a path for NPAgent to traverse to the closest un-tagged treasure
         /// </summary>
         /// <returns></returns>
         private List<NavNode> chooseClosestTreasure(List<Treasure> treasures)
@@ -147,20 +147,22 @@ namespace AGMGSK
             float distance = 0;
             float minDistance = 10000000000000000;
             Treasure minTreasure = null;
-
-
-            /* Find Treasure that is closest to npAgent */
+            
+            /* Loop through all treasures to find one that is closest to npAgent */
             foreach (Treasure treasure in treasures)
             {
                 /* Find the closest non-tagged treasure */
                 if (treasure.IsTagged == false)
                 {
+                    /* Compare distances of treasure and npAgent */ 
                     distance = Vector3.Distance(
-                   treasure.position,
-                   new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
+                        treasure.position,
+                        new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z)
+                    );
 
                     Debug.WriteLine("distance = " + distance);
 
+                    /* If closer treasure found, set as potential next treasure */ 
                     if (distance < minDistance)
                     {
                         minTreasure = treasure;
@@ -169,14 +171,14 @@ namespace AGMGSK
                 }
             }
 
-
             List<NavNode> aPath = new List<NavNode>();
-            /* Set Treasure Path */
+            
+            /* Set path to treasure or if untagged one found, stop */
             if (minTreasure != null)
-            {               
+            { // create a path to the treasure   
                 aPath.Add(new NavNode(minTreasure.position,
                          NavNode.NavNodeEnum.PATH));
-            } else {
+            } else { // no untagged treasure found, reset agent so it stops moving. 
                 base.reset();
             }
          
