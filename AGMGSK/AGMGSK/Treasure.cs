@@ -37,14 +37,6 @@ namespace AGMGSK
             get { return isTagged; }
         }
 
-        // store position of treasure before calling the addObject function.
-        override public Object3D addObject(Vector3 position, Vector3 orientAxis, float radians)
-        {
-            this.position = position;
-            return base.addObject(position, orientAxis, radians);
-
-        }
-
         // Sets isTagged to true and outputs the Agent who tagged the treasure
         public void SetTagged(Agent agent)
         {
