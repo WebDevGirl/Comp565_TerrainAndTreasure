@@ -63,7 +63,6 @@ namespace AGMGSK
         private Path path;
         private Path terrian_path;
         private Path treasure_path;
-        private Path savedPath;
         private int snapDistance = 20;
         private int turnCount = 0;
         private int mode = 0;
@@ -92,13 +91,15 @@ namespace AGMGSK
             stage.Components.Add(terrian_path);
 
 
-            path = terrian_path;
+            path = terrian_path; // start off in path finding mode
             nextGoal = path.NextNode;  // get first path goal
             agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
         }
 
         /// <summary>
         /// Switch the npAgent's navigation mode to either treasure or path finding
+        /// 0: Path Finding Mode
+        /// 1: Treasure Finding Mode
         /// </summary>
         /// <returns></returns>
         public void switchMode()
@@ -113,11 +114,13 @@ namespace AGMGSK
                 case 1: // Switch to Mode: Treasure Finding
                     Debug.WriteLine("Switch To Mode: Treasure Finding");
                     savedGoal = nextGoal;
-
+                    
+                    // Set current treasure finding path to closest treasure
                     treasure_path = new Path(stage, chooseClosestTreasure(stage.Treasures), Path.PathType.LOOP);
 
                     Debug.WriteLine("tp: " + treasure_path.Count);
 
+                    // if treasure found find it by setting path nextGoal
                     if (treasure_path.Count != 0)
                     {
                         stage.Components.Add(treasure_path);

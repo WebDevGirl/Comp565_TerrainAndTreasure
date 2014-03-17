@@ -471,27 +471,21 @@ namespace AGMGSK
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
             treasures.Add(tr);
-
-            tr = new Treasure(this, "t2", "hash");
-            tr.addObject(new Vector3(380 * spacing, terrain.surfaceHeight(380, 500) + 110, 500 * spacing),
-                new Vector3(0, 1, 0), 0.79f);
-            Components.Add(tr);
-            treasures.Add(tr);
-
+         
             // inside the wall, rotated to fit
-            tr = new Treasure(this, "t3", "hash");
+            tr = new Treasure(this, "t2", "hash");
             tr.addObject(new Vector3(446 * spacing, terrain.surfaceHeight(446, 450) + 110, 450 * spacing),
                 new Vector3(0, 1, 0), 1.45f);
             Components.Add(tr);
             treasures.Add(tr);
 
-            tr = new Treasure(this, "t4", "hash");
+            tr = new Treasure(this, "t3", "hash");
             tr.addObject(new Vector3(348 * spacing, terrain.surfaceHeight(348, 330) + 110, 330 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
             treasures.Add(tr);
 
-            tr = new Treasure(this, "t5", "hash");
+            tr = new Treasure(this, "t4", "hash");
             tr.addObject(new Vector3(297 * spacing, terrain.surfaceHeight(297, 340) + 210, 340 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
