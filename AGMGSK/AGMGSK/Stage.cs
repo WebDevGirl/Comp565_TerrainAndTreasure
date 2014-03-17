@@ -1,21 +1,31 @@
-﻿/*  
-    Copyright (C) 2014 G. Michael Barnes
+﻿/* 
+ * -------------------------------------------
+ * HACKER TERRAIN AND TREASURE GAME v.01
+ * -------------------------------------------
+ * Class: Comp 565 - Spring 2014
+ * Author: Ursula Messick <ursula.messick.95@my.csun.edu>
+ * Author: Billy Morales <billy.morales.520@my.csun.edu>
+ * 
+*/
+
+/*  
+  Copyright (C) 2014 G. Michael Barnes
  
-    The file Stage.cs is part of AGMGSKv5 a port of AGXNASKv4 from
-    XNA 4 refresh to MonoGames 3.0.6.
+  The file Stage.cs is part of AGMGSKv5 a port of AGXNASKv4 from
+  XNA 4 refresh to MonoGames 3.0.6.
 
-    AGMGSKv5 is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  AGMGSKv5 is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #region Using Statements

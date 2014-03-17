@@ -1,4 +1,14 @@
-﻿using System;
+﻿/* 
+ * -------------------------------------------
+ * HACKER TERRAIN AND TREASURE GAME v.01
+ * -------------------------------------------
+ * Class: Comp 565 - Spring 2014
+ * Author: Ursula Messick <ursula.messick.95@my.csun.edu>
+ * Author: Billy Morales <billy.morales.520@my.csun.edu>
+ * 
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
