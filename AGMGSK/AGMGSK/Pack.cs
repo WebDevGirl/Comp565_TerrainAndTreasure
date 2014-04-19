@@ -52,11 +52,16 @@ namespace AGMGSK
     /// 
     /// 1/25/2012 last changed
     /// </summary>
+    /// 
+    enum FlockLevel { LOW = 0, LOW_MID = 33, HIGH_MID = 66, HIGH = 99 }
+
     public class Pack : MovableModel3D
     {
         Object3D leader;
-        Agent agentLeader;
         Random random = null;
+
+        // Pack flocking level
+        static FlockLevel level = FlockLevel.LOW;
 
         /// <summary>
         /// Construct a leaderless pack.
@@ -84,14 +89,7 @@ namespace AGMGSK
         {
             isCollidable = true;
             leader = aLeader;
-        }
-
-        // Construct a pact with an Agent as leader
-        public Pack(Stage theStage, string label, string meshFile, Agent aLeader)
-            : base(theStage, label, meshFile)
-        {
-            isCollidable = true;
-            agentLeader = aLeader;
+            random = new Random();
         }
 
         /// <summary>
@@ -118,6 +116,29 @@ namespace AGMGSK
             base.Update(gameTime);  // MovableMesh's Update(); 
         }
 
+        public static void changeFlockLevel() 
+        {
+            switch (level)
+            {
+                case FlockLevel.LOW:
+                    level = FlockLevel.LOW_MID;
+                    break;
+                case FlockLevel.LOW_MID:
+                    level = FlockLevel.HIGH_MID;
+                    break;
+                case FlockLevel.HIGH_MID:
+                    level = FlockLevel.HIGH;
+                    break;
+                case FlockLevel.HIGH:
+                    level = FlockLevel.LOW;
+                    break;
+            }
+        }
+
+        public static int getLevelValue()
+        {
+            return (int)level;
+        }
 
         public Object3D Leader
         {

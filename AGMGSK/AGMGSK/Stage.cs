@@ -116,9 +116,6 @@ namespace AGMGSK
         protected int draws, updates;
         // Treasures to tag
         protected List<Treasure> treasures = new List<Treasure>();
-        // Pack flocking level
-        protected enum FlockLevel { LOW = 0, LOW_MID = 33, HIGH_MID = 66, HIGH = 99 }
-        FlockLevel level = FlockLevel.LOW;
 
         /// <summary>
         /// Set the Scene.
@@ -514,8 +511,8 @@ namespace AGMGSK
             Wall wall = new Wall(this, "wall", "100x100x100Brick");
             Components.Add(wall);
             Random random = new Random();  // used for pack and cloud
-            // create a Pack of dogs
-            Pack pack = new Pack(this, "dog", "dogV3");
+            // create a Pack of dogs with Player as the leader
+            Pack pack = new Pack(this, "dog", "dogV3", player.AgentObject);
             Components.Add(pack);
             for (int x = -9; x < 10; x += 6)
                 for (int z = -3; z < 4; z += 6)
@@ -582,7 +579,7 @@ namespace AGMGSK
                    string.Format("npAgent:  Treasures Tagged   " + npAgent.TreasuresTagged + "   Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
                    npAgent.AgentObject.Translation.X, npAgent.AgentObject.Translation.Y, npAgent.AgentObject.Translation.Z,
                    npAgent.AgentObject.Forward.X, npAgent.AgentObject.Forward.Y, npAgent.AgentObject.Forward.Z));
-                inspector.setInfo(13, string.Format("Flocking Level:    " + (int)level + "%"));
+                inspector.setInfo(13, string.Format("Flocking Level:    " + Pack.getLevelValue() + "%"));
                 inspector.setMatrices("player", "npAgent", player.AgentObject.Orientation, npAgent.AgentObject.Orientation);
             }
             // Process user keyboard events that relate to the render state of the the stage
@@ -623,21 +620,7 @@ namespace AGMGSK
 
             else if (keyboardState.IsKeyDown(Keys.P) && !oldKeyboardState.IsKeyDown(Keys.P))
             {
-                switch (level)
-                {
-                    case FlockLevel.LOW:
-                        level = FlockLevel.LOW_MID;
-                        break;
-                    case FlockLevel.LOW_MID:
-                        level = FlockLevel.HIGH_MID;
-                        break;
-                    case FlockLevel.HIGH_MID:
-                        level = FlockLevel.HIGH;
-                        break;
-                    case FlockLevel.HIGH:
-                        level = FlockLevel.LOW;
-                        break;
-                }
+                Pack.changeFlockLevel();
             }
             oldKeyboardState = keyboardState;    // Update saved state.
             checkForTreasure();
