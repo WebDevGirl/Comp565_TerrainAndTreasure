@@ -107,9 +107,9 @@ namespace AGMGSK
             switch (mode)
             {
                 case 0: // Switch to Mode: EM --> TM
-                    Debug.WriteLine("Switching Mode: Explore Mode --> Treasure Mode");
+                    Debug.WriteLine("Switching Mode: Explore Mode --> Treasure Mode (" + mode + " --> "+ (mode+1) % 2 +" )");
                     mode = 1;
-                    restart();
+                    
                     // Save EM goal
                     savedGoal = nextGoal; 
 
@@ -118,20 +118,25 @@ namespace AGMGSK
 
                     // if treasure found find it by setting path nextGoal
                     if (treasure_path.Count != 0)
-                    {
-                        Debug.WriteLine("Found a treasure path"); 
+                    {                      
+                        restart(); // Start moving again incase we are stopped
                         stage.Components.Add(treasure_path);
                         path = treasure_path;
                         nextGoal = path.NextNode;
                         agentObject.turnToFace(nextGoal.Translation);
+                    } else {
+                        Debug.WriteLine("No treasures found, stop"); 
+                        base.reset();
                     }
 
                     break;
                 case 1: // Switch to Mode: TM -- EM
+                    Debug.WriteLine("Switching Mode: Treasure Mode --> Explore Mode (" + mode + " --> " + (mode + 1) % 2 + " )");
                     mode = 0;
-                    Debug.WriteLine("Switching Mode: Treasure Mode --> Explore Mode");
+                   
                     switchModeToPathFinding();
                     nextGoal = savedGoal;
+                    agentObject.turnToFace(nextGoal.Translation);
                     break;
                 default:
                     Debug.WriteLine("Bad Toggle Mode");
@@ -147,7 +152,6 @@ namespace AGMGSK
         public void switchModeToPathFinding()
         {
             mode = 0;
-            Debug.WriteLine("Switch To Mode: Path Finding");
             path = terrian_path;            
         }
 
@@ -159,7 +163,7 @@ namespace AGMGSK
         {
             if (path.Done && mode == 1)
             {
-                switchModeToPathFinding();
+                switchMode();
                 return savedGoal;
             }
             return path.NextNode;
@@ -175,6 +179,7 @@ namespace AGMGSK
             float distance = 0;
             float minDistance = 10000000000000000;
             Treasure minTreasure = null;
+            List<NavNode> aPath = new List<NavNode>();
             
             /* Loop through all treasures to find one that is closest to npAgent */
             foreach (Treasure treasure in treasures)
@@ -196,16 +201,12 @@ namespace AGMGSK
                     }
                 }
             }
-
-            List<NavNode> aPath = new List<NavNode>();
-            
-            /* Set path to treasure or if untagged one found, stop */
+                                  
+            /* Set path to treasure or if untagged one found */
             if (minTreasure != null)
-            { // create a path to the treasure   
-                aPath.Add(new NavNode(minTreasure.position,
-                         NavNode.NavNodeEnum.PATH));
-            } else { // no untagged treasure found, reset agent so it stops moving. 
-                base.reset();
+            { 
+                // create a path to the treasure   
+                aPath.Add(new NavNode(minTreasure.position, NavNode.NavNodeEnum.PATH));
             }
          
             return (aPath);
