@@ -152,6 +152,16 @@ namespace AGMGSK
         }
 
         /// <summary>
+        /// Finds the next Goal based on mode and position
+        /// </summary>
+        /// <returns>NavNode</returns>
+        public NavNode getNextGoal()
+        {
+            return path.NextNode;
+        }
+
+
+        /// <summary>
         /// Procedurally make a path for NPAgent to traverse to the closest un-tagged treasure
         /// </summary>
         /// <returns></returns>
@@ -254,8 +264,10 @@ namespace AGMGSK
                string.Format("npAvatar:  Location ({0:f0},{1:f0},{2:f0})  Looking at ({3:f2},{4:f2},{5:f2})",
                   agentObject.Translation.X, agentObject.Translation.Y, agentObject.Translation.Z,
                   agentObject.Forward.X, agentObject.Forward.Y, agentObject.Forward.Z));
+
             stage.setInfo(16,
                string.Format("nextGoal:  ({0:f0},{1:f0},{2:f0})", nextGoal.Translation.X, nextGoal.Translation.Y, nextGoal.Translation.Z));
+           
             // See if at or close to nextGoal, distance measured in the flat XZ plane
             float distance = Vector3.Distance(
                new Vector3(nextGoal.Translation.X, 0, nextGoal.Translation.Z),
@@ -270,7 +282,8 @@ namespace AGMGSK
                 if (mode == 1) {  // If on Treasure Path switch path to path finding and saved goal 
                     switchModeToPathFinding();
                 } else {  // else snap to nextGoal and orient toward the new nextGoal 
-                    nextGoal = path.NextNode;
+                    nextGoal = getNextGoal();
+
                     agentObject.turnToFace(nextGoal.Translation);
 
                     if (path.Done) {
@@ -281,6 +294,7 @@ namespace AGMGSK
                     }
                 }                     
             }
+
             base.Update(gameTime);  // Agent's Update();
         }
     }
