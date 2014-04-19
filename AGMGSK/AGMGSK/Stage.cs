@@ -116,6 +116,9 @@ namespace AGMGSK
         protected int draws, updates;
         // Treasures to tag
         protected List<Treasure> treasures = new List<Treasure>();
+        // Pack flocking level
+        protected enum FlockLevel { LOW = 0, LOW_MID = 33, HIGH_MID = 66, HIGH = 99 }
+        FlockLevel level = FlockLevel.LOW;
 
         /// <summary>
         /// Set the Scene.
@@ -420,6 +423,7 @@ namespace AGMGSK
             inspector.setInfo(2, "Inspector toggles:  'H' help or info   'M'  matrix or info   'I'  displays next info pane.");
             inspector.setInfo(3, "Arrow keys move the player in, out, left, or right.  'R' resets player to initial orientation.");
             inspector.setInfo(4, "Stage toggles:  'B' bounding spheres, 'C' cameras, 'F' fog, 'T' updates, 'Y' yon");
+            inspector.setInfo(5, "Press 'P' to change packing level of flock");
             // initialize empty info strings
             for (int i = 5; i < 20; i++) inspector.setInfo(i, "  ");
             inspector.setInfo(5, "matrics info pane, initially empty");
@@ -578,6 +582,7 @@ namespace AGMGSK
                    string.Format("npAgent:  Treasures Tagged   " + npAgent.TreasuresTagged + "   Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
                    npAgent.AgentObject.Translation.X, npAgent.AgentObject.Translation.Y, npAgent.AgentObject.Translation.Z,
                    npAgent.AgentObject.Forward.X, npAgent.AgentObject.Forward.Y, npAgent.AgentObject.Forward.Z));
+                inspector.setInfo(13, string.Format("Flocking Level:    " + (int)level + "%"));
                 inspector.setMatrices("player", "npAgent", player.AgentObject.Orientation, npAgent.AgentObject.Orientation);
             }
             // Process user keyboard events that relate to the render state of the the stage
@@ -615,6 +620,25 @@ namespace AGMGSK
                 FixedStepRendering = !FixedStepRendering;
             else if (keyboardState.IsKeyDown(Keys.Y) && !oldKeyboardState.IsKeyDown(Keys.Y))
                 YonFlag = !YonFlag;  // toggle Yon clipping value.
+
+            else if (keyboardState.IsKeyDown(Keys.P) && !oldKeyboardState.IsKeyDown(Keys.P))
+            {
+                switch (level)
+                {
+                    case FlockLevel.LOW:
+                        level = FlockLevel.LOW_MID;
+                        break;
+                    case FlockLevel.LOW_MID:
+                        level = FlockLevel.HIGH_MID;
+                        break;
+                    case FlockLevel.HIGH_MID:
+                        level = FlockLevel.HIGH;
+                        break;
+                    case FlockLevel.HIGH:
+                        level = FlockLevel.LOW;
+                        break;
+                }
+            }
             oldKeyboardState = keyboardState;    // Update saved state.
             checkForTreasure();
             base.Update(gameTime);  // update all GameComponents and DrawableGameComponents

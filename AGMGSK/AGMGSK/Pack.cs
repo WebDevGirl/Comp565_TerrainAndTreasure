@@ -55,6 +55,7 @@ namespace AGMGSK
     public class Pack : MovableModel3D
     {
         Object3D leader;
+        Agent agentLeader;
         Random random = null;
 
         /// <summary>
@@ -83,6 +84,14 @@ namespace AGMGSK
         {
             isCollidable = true;
             leader = aLeader;
+        }
+
+        // Construct a pact with an Agent as leader
+        public Pack(Stage theStage, string label, string meshFile, Agent aLeader)
+            : base(theStage, label, meshFile)
+        {
+            isCollidable = true;
+            agentLeader = aLeader;
         }
 
         /// <summary>
@@ -115,6 +124,5 @@ namespace AGMGSK
             get { return leader; }
             set { leader = value; }
         }
-
     }
 }
