@@ -104,31 +104,34 @@ namespace AGMGSK
         /// <returns></returns>
         public void switchMode()
         {
-            mode = (mode + 1) % 2;
             switch (mode)
             {
-                case 0: // Switch to Mode: Path Finding
-                    switchModeToPathFinding();
+                case 0: // Switch to Mode: EM --> TM
+                    Debug.WriteLine("Switching Mode: Explore Mode --> Treasure Mode");
+                    mode = 1;
                     restart();
-                    break;
-                case 1: // Switch to Mode: Treasure Finding
-                    Debug.WriteLine("Switch To Mode: Treasure Finding");
-                    savedGoal = nextGoal;
-                    
-                    // Set current treasure finding path to closest treasure
-                    treasure_path = new Path(stage, chooseClosestTreasure(stage.Treasures), Path.PathType.LOOP);
+                    // Save EM goal
+                    savedGoal = nextGoal; 
 
-                    Debug.WriteLine("tp: " + treasure_path.Count);
+                    // Set current treasure finding path to closest treasure
+                    treasure_path = new Path(stage, chooseClosestTreasure(stage.Treasures), Path.PathType.SINGLE);
 
                     // if treasure found find it by setting path nextGoal
                     if (treasure_path.Count != 0)
                     {
+                        Debug.WriteLine("Found a treasure path"); 
                         stage.Components.Add(treasure_path);
                         path = treasure_path;
                         nextGoal = path.NextNode;
                         agentObject.turnToFace(nextGoal.Translation);
                     }
-                                       
+
+                    break;
+                case 1: // Switch to Mode: TM -- EM
+                    mode = 0;
+                    Debug.WriteLine("Switching Mode: Treasure Mode --> Explore Mode");
+                    switchModeToPathFinding();
+                    nextGoal = savedGoal;
                     break;
                 default:
                     Debug.WriteLine("Bad Toggle Mode");
@@ -145,10 +148,7 @@ namespace AGMGSK
         {
             mode = 0;
             Debug.WriteLine("Switch To Mode: Path Finding");
-            path = terrian_path;
-            nextGoal = savedGoal;
-            agentObject.turnToFace(nextGoal.Translation);
-
+            path = terrian_path;            
         }
 
         /// <summary>
@@ -157,6 +157,11 @@ namespace AGMGSK
         /// <returns>NavNode</returns>
         public NavNode getNextGoal()
         {
+            if (path.Done && mode == 1)
+            {
+                switchModeToPathFinding();
+                return savedGoal;
+            }
             return path.NextNode;
         }
 
@@ -182,8 +187,6 @@ namespace AGMGSK
                         treasure.position,
                         new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z)
                     );
-
-                    Debug.WriteLine("distance = " + distance);
 
                     /* If closer treasure found, set as potential next treasure */ 
                     if (distance < minDistance)
@@ -231,24 +234,24 @@ namespace AGMGSK
                      NavNode.NavNodeEnum.WAYPOINT));
             aPath.Add(new NavNode(new Vector3(383 * spacing, stage.Terrain.surfaceHeight(383, 500), 500 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
-            // go by wall   
-            aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            // turning circle 
-            aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
-                     NavNode.NavNodeEnum.WAYPOINT));
+            //// go by wall   
+            //aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //// turning circle 
+            //aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
+            //aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+            //         NavNode.NavNodeEnum.WAYPOINT));
             return (aPath);
         }
 
@@ -267,32 +270,29 @@ namespace AGMGSK
 
             stage.setInfo(16,
                string.Format("nextGoal:  ({0:f0},{1:f0},{2:f0})", nextGoal.Translation.X, nextGoal.Translation.Y, nextGoal.Translation.Z));
-           
+
             // See if at or close to nextGoal, distance measured in the flat XZ plane
             float distance = Vector3.Distance(
                new Vector3(nextGoal.Translation.X, 0, nextGoal.Translation.Z),
                new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));
-            stage.setInfo(17, string.Format("Next Node = {0}", path.nextNode));
+            stage.setInfo(15, string.Format("Next Node = {0}", path.nextNode));
+            stage.setInfo(16, string.Format("distance to goal = {0,5:f2}", distance));
 
             if (distance <= snapDistance)
             {
-                stage.setInfo(17, string.Format("distance to goal = {0,5:f2}", distance));
+                // Get Next Goal, includes switching to the correct mode
+                nextGoal = getNextGoal();
+                agentObject.turnToFace(nextGoal.Translation);
 
-                /* Decide Next Goal */
-                if (mode == 1) {  // If on Treasure Path switch path to path finding and saved goal 
-                    switchModeToPathFinding();
-                } else {  // else snap to nextGoal and orient toward the new nextGoal 
-                    nextGoal = getNextGoal();
-
-                    agentObject.turnToFace(nextGoal.Translation);
-
-                    if (path.Done) {
-                        stage.setInfo(18, "path traversal is done");
-                    } else {
-                        turnCount++;
-                        stage.setInfo(18, string.Format("turnToFace count = {0}", turnCount));
-                    }
-                }                     
+                // See if we should stop or turn twoards next goal
+                if (path.Done)
+                {
+                    stage.setInfo(18, "path traversal is done");
+                    base.reset(); // Stop NP Agent
+                } else {
+                    turnCount++;
+                    stage.setInfo(17, string.Format("turnToFace count = {0}", turnCount));
+                }
             }
 
             base.Update(gameTime);  // Agent's Update();
