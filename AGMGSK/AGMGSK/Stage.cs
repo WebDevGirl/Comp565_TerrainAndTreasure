@@ -420,6 +420,7 @@ namespace AGMGSK
             inspector.setInfo(2, "Inspector toggles:  'H' help or info   'M'  matrix or info   'I'  displays next info pane.");
             inspector.setInfo(3, "Arrow keys move the player in, out, left, or right.  'R' resets player to initial orientation.");
             inspector.setInfo(4, "Stage toggles:  'B' bounding spheres, 'C' cameras, 'F' fog, 'T' updates, 'Y' yon");
+            inspector.setInfo(5, "Press 'P' to change packing level of flock");
             // initialize empty info strings
             for (int i = 5; i < 20; i++) inspector.setInfo(i, "  ");
             inspector.setInfo(5, "matrics info pane, initially empty");
@@ -510,8 +511,8 @@ namespace AGMGSK
             Wall wall = new Wall(this, "wall", "100x100x100Brick");
             Components.Add(wall);
             Random random = new Random();  // used for pack and cloud
-            // create a Pack of dogs
-            Pack pack = new Pack(this, "dog", "dogV3");
+            // create a Pack of dogs with Player as the leader
+            Pack pack = new Pack(this, "dog", "dogV3", player.AgentObject);
             Components.Add(pack);
             for (int x = -9; x < 10; x += 6)
                 for (int z = -3; z < 4; z += 6)
@@ -578,6 +579,7 @@ namespace AGMGSK
                    string.Format("npAgent:  Treasures Tagged   " + npAgent.TreasuresTagged + "   Location ({0,5:f0},{1,3:f0},{2,5:f0})  Looking at ({3,5:f2},{4,5:f2},{5,5:f2})",
                    npAgent.AgentObject.Translation.X, npAgent.AgentObject.Translation.Y, npAgent.AgentObject.Translation.Z,
                    npAgent.AgentObject.Forward.X, npAgent.AgentObject.Forward.Y, npAgent.AgentObject.Forward.Z));
+                inspector.setInfo(13, string.Format("Flocking Level:    " + Pack.getLevelValue() + "%"));
                 inspector.setMatrices("player", "npAgent", player.AgentObject.Orientation, npAgent.AgentObject.Orientation);
             }
             // Process user keyboard events that relate to the render state of the the stage
@@ -615,6 +617,11 @@ namespace AGMGSK
                 FixedStepRendering = !FixedStepRendering;
             else if (keyboardState.IsKeyDown(Keys.Y) && !oldKeyboardState.IsKeyDown(Keys.Y))
                 YonFlag = !YonFlag;  // toggle Yon clipping value.
+
+            else if (keyboardState.IsKeyDown(Keys.P) && !oldKeyboardState.IsKeyDown(Keys.P))
+            {
+                Pack.changeFlockLevel();
+            }
             oldKeyboardState = keyboardState;    // Update saved state.
             checkForTreasure();
             base.Update(gameTime);  // update all GameComponents and DrawableGameComponents
