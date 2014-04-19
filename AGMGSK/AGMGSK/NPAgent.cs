@@ -107,7 +107,7 @@ namespace AGMGSK
             switch (mode)
             {
                 case 0: // Switch to Mode: EM --> TM
-                    Debug.WriteLine("Switching Mode: Explore Mode --> Treasure Mode (" + mode + " --> "+ (mode+1) % 2 +" )");
+                    Debug.WriteLine("Switching Mode: Explore Mode --> Treasure Mode (" + mode + " --> "+ (mode+1) % 3 +" )");
                     mode = 1;
                     
                     // Save EM goal
@@ -130,12 +130,23 @@ namespace AGMGSK
                     }
 
                     break;
-                case 1: // Switch to Mode: TM -- EM
-                    Debug.WriteLine("Switching Mode: Treasure Mode --> Explore Mode (" + mode + " --> " + (mode + 1) % 2 + " )");
-                    mode = 0;
-                   
-                    switchModeToPathFinding();
+                case 1: // Switch to Mode: TM --> RM
+                    Debug.WriteLine("Switching Mode: Treasure Mode --> Return Mode (" + mode + " --> " + (mode + 1) % 3 + " )");
+                    mode = 2;                  
+                    path = terrian_path;  // Set path back to Explore Mode Path   
                     nextGoal = savedGoal;
+                    agentObject.turnToFace(nextGoal.Translation);
+                    break;
+                case 2: // Switch to Mode: RM --> EM
+                    Debug.WriteLine("Switching Mode: Return Mode --> Explore Mode (" + mode + " --> " + (mode + 1) % 3 + " )");
+                    mode = 0;
+                    path = terrian_path; // Set path back to Explore Mode Path  
+                   
+                    // Update goal if we reached our last saved goal, otherwise keep savedGoal
+                    if (nextGoal != savedGoal)
+                    {
+                        nextGoal = path.NextNode;
+                    }
                     agentObject.turnToFace(nextGoal.Translation);
                     break;
                 default:
@@ -156,17 +167,22 @@ namespace AGMGSK
         }
 
         /// <summary>
-        /// Finds the next Goal based on mode and position
+        /// Sets next goal based on mode and position
         /// </summary>
         /// <returns>NavNode</returns>
-        public NavNode getNextGoal()
+        public void setNextGoal()
         {
-            if (path.Done && mode == 1)
-            {
-                switchMode();
-                return savedGoal;
+            if (path.Done && mode == 1) { // Current path is done as we are in TreasureMode
+                switchMode();               
             }
-            return path.NextNode;
+            else if (mode == 2) { // Current path is done and we are in ReturnMode
+                switchMode();                
+            } else { 
+                nextGoal = path.NextNode;
+                agentObject.turnToFace(nextGoal.Translation);
+            }     
+      
+            
         }
 
 
@@ -281,9 +297,14 @@ namespace AGMGSK
 
             if (distance <= snapDistance)
             {
-                // Get Next Goal, includes switching to the correct mode
-                nextGoal = getNextGoal();
-                agentObject.turnToFace(nextGoal.Translation);
+                // Clear saved goal if its set and we just reached it
+                if ((savedGoal != null) && (nextGoal == savedGoal))
+                {
+                    savedGoal = null;
+                }
+
+                // Set Next Goal, includes switching to the correct mode
+                setNextGoal();                
 
                 // See if we should stop or turn twoards next goal
                 if (path.Done)
