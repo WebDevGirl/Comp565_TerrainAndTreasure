@@ -275,22 +275,40 @@ namespace AGMGSK
         // Checks whether an NPAgent can sense a treasure within a certain radius
         public void senseTreasures()
         {
+            bool allTagged = true;
+
             // Only sense if not in TM            
             if (mode != 0) { return; }
+           
+            // Loop through all untagged treasures and fine one within radius
             foreach (Treasure treasure in stage.Treasures)
             {
-               float distance = Vector3.Distance(
+               if (treasure.IsTagged == false) {
+                   allTagged = false;
+                  
+                   // Compare distance between treasure and agent to see if we canse 'sense' it
+                   float distance = Vector3.Distance(
                         treasure.position,
                         new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z)
                     );
 
-               if (distance < 1000)
-                {
-                    Debug.WriteLine("Treasure Detected!! Search for it. " + distance);
-                    switchMode();
-                    return;
-                }
-            }                     
+                   if (distance < 28000)
+                   {
+                       Debug.WriteLine("Treasure Detected!! Search for it. " + distance);
+                       switchMode();
+                       return;
+                   }
+               }
+                
+            } //forloop
+
+            // If all treasures were tagged, stopped searching. 
+            if (allTagged == true)
+            {
+                reset();
+            }
+           
+
         }
 
 
