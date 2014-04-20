@@ -100,19 +100,59 @@ namespace AGMGSK
         public override void Update(GameTime gameTime)
         {
             // if (leader == null) need to determine "virtual leader from members"
+            int radius = 1000;
+            float arcAngle = 4.71f;
             float angle = 0.3f;
-            foreach (Object3D obj in instance)
+
+            if (leader == null)
             {
-                obj.Yaw = 0.0f;
-                // change direction 4 time a second  0.07 = 4/60
-                if (random.NextDouble() < 0.07)
+                foreach (Object3D obj in instance)
                 {
-                    if (random.NextDouble() < 0.5) obj.Yaw -= angle; // turn left
-                    else obj.Yaw += angle; // turn right
+                    obj.Yaw = 0.0f;
+                    // change direction 4 time a second  0.07 = 4/60
+                    if (random.NextDouble() < 0.07)
+                    {
+                        if (random.NextDouble() < 0.5) obj.Yaw -= angle; // turn left
+                        else obj.Yaw += angle; // turn right
+                    }
+                    obj.updateMovableObject();
+                    stage.setSurfaceHeight(obj);
                 }
-                obj.updateMovableObject();
-                stage.setSurfaceHeight(obj);
             }
+
+            else
+            {
+                foreach (Object3D obj in instance)
+                {
+                    float distance = Vector3.Distance(obj.Translation, leader.Translation);
+
+                    Vector3 diff = obj.Translation - leader.Translation;
+                    double range = (-Math.Atan2((obj.Translation.X - leader.Translation.X), (obj.Translation.Z - leader.Translation.Z)));
+
+                    if (distance <= (float)radius)
+                    {
+                        obj.Forward = leader.Forward;
+                        diff += new Vector3(10, 0, 10);
+                        obj.Translation = leader.Translation + diff;
+                    }
+
+                    else
+                    {
+                        obj.Yaw = 0.0f;
+                        // change direction 4 time a second  0.07 = 4/60
+                        if (random.NextDouble() < 0.07)
+                        {
+                            if (random.NextDouble() < 0.5) obj.Yaw -= angle; // turn left
+                            else obj.Yaw += angle; // turn right
+                        }
+                    }
+
+                    
+                    obj.updateMovableObject();
+                    stage.setSurfaceHeight(obj);
+                }
+            }
+
             base.Update(gameTime);  // MovableMesh's Update(); 
         }
 
