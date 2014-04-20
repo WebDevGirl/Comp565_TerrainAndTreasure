@@ -272,6 +272,27 @@ namespace AGMGSK
             return (aPath);
         }
 
+        // Checks whether an NPAgent can sense a treasure within a certain radius
+        public void senseTreasures()
+        {
+            // Only sense if not in TM            
+            if (mode != 0) { return; }
+            foreach (Treasure treasure in stage.Treasures)
+            {
+               float distance = Vector3.Distance(
+                        treasure.position,
+                        new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z)
+                    );
+
+               if (distance < 1000)
+                {
+                    Debug.WriteLine("Treasure Detected!! Search for it. " + distance);
+                    switchMode();
+                    return;
+                }
+            }                     
+        }
+
 
         /// <summary>
         /// Simple path following.  If within "snap distance" of a the nextGoal (a NavNode) 
@@ -316,6 +337,8 @@ namespace AGMGSK
                     stage.setInfo(17, string.Format("turnToFace count = {0}", turnCount));
                 }
             }
+
+            senseTreasures();
 
             base.Update(gameTime);  // Agent's Update();
         }
