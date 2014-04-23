@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 namespace AGMGSK {
 
-    class Graph{
+    public class Graph{
         const float agentRadius = 161.274811f;
         List<GraphNode> open;
         List<GraphNode> closed;

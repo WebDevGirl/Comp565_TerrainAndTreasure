@@ -100,8 +100,6 @@ namespace AGMGSK
         public override void Update(GameTime gameTime)
         {
             // if (leader == null) need to determine "virtual leader from members"
-            int radius = 1000;
-            float arcAngle = 4.71f;
             float angle = 0.3f;
 
             if (leader == null)
@@ -124,33 +122,16 @@ namespace AGMGSK
             {
                 foreach (Object3D obj in instance)
                 {
-                    float distance = Vector3.Distance(obj.Translation, leader.Translation);
 
-                    Vector3 diff = obj.Translation - leader.Translation;
-                    double range = (-Math.Atan2((obj.Translation.X - leader.Translation.X), (obj.Translation.Z - leader.Translation.Z)));
-
-                    if (distance <= (float)radius)
-                    {
-                        obj.Forward = leader.Forward;
-                        diff += new Vector3(10, 0, 10);
-                        obj.Translation = leader.Translation + diff;
-                    }
-
-                    else
-                    {
-                        obj.Yaw = 0.0f;
-                        // change direction 4 time a second  0.07 = 4/60
-                        if (random.NextDouble() < 0.07)
-                        {
-                            if (random.NextDouble() < 0.5) obj.Yaw -= angle; // turn left
-                            else obj.Yaw += angle; // turn right
-                        }
-                    }
+                    obj.Translation += getCohesion(obj) + getSeparation(obj);
+                    
+                    obj.Forward = leader.Forward;
 
                     
                     obj.updateMovableObject();
                     stage.setSurfaceHeight(obj);
                 }
+
             }
 
             base.Update(gameTime);  // MovableMesh's Update(); 
@@ -173,6 +154,49 @@ namespace AGMGSK
                     level = FlockLevel.LOW;
                     break;
             }
+        }
+
+        public Vector3 getAlignment(Object3D current)
+        {
+           
+            return Vector3.Normalize(leader.Forward);
+
+        }
+
+        public Vector3 getCohesion(Object3D current)
+        {
+            if (current != leader)
+            {
+                Vector3 cohesion = current.Translation - leader.Translation;
+                
+                cohesion.Normalize();
+                return cohesion * -10;
+            }
+            return Vector3.Zero;
+
+        }
+
+        public Vector3 getSeparation(Object3D current)
+        {
+            Vector3 separation = Vector3.Zero;
+            float distanceRadius = 5000;
+            foreach (Object3D obj in instance)
+            {
+                if (current != obj && current != leader)
+                {
+
+                    if (Vector3.Distance(current.Translation, leader.Translation) < distanceRadius)
+                    {
+                        separation = current.Translation - leader.Translation;
+                        float scale = separation.Length() / distanceRadius;
+
+                        separation.Normalize();
+                        separation /= scale;
+
+                    }
+                }
+            }
+            return separation;
         }
 
         public static int getLevelValue()
