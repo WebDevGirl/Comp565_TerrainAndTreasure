@@ -116,7 +116,7 @@ namespace AGMGSK
         protected int draws, updates;
         // Treasures to tag
         protected List<Treasure> treasures = new List<Treasure>();
-
+        protected Graph graph;
         /// <summary>
         /// Set the Scene.
         /// The Scene contains all "application-specific" content that is to added to
@@ -512,8 +512,8 @@ namespace AGMGSK
             Components.Add(wall);
 
 
-            Graph graph = new Graph(this);
-            Components.Add( graph.GetAStarPath(new Vector3(510 * spacing, terrain.surfaceHeight(510, 507), 507 * spacing), new Vector3(410 * spacing, terrain.surfaceHeight(410, 414) + 110, 414 * spacing)));
+            graph = new Graph(this);
+            //Components.Add( graph.GetAStarPath(new Vector3(510 * spacing, terrain.surfaceHeight(510, 507), 507 * spacing), new Vector3(410 * spacing, terrain.surfaceHeight(410, 414) + 110, 414 * spacing)));
 
             Random random = new Random();  // used for pack and cloud
             // create a Pack of dogs with Player as the leader
