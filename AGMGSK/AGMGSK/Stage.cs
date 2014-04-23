@@ -510,6 +510,11 @@ namespace AGMGSK
             // create walls for obstacle avoidance or path finding algorithms
             Wall wall = new Wall(this, "wall", "100x100x100Brick");
             Components.Add(wall);
+
+
+            Graph graph = new Graph(this);
+            Components.Add( graph.GetAStarPath(new Vector3(510 * spacing, terrain.surfaceHeight(510, 507), 507 * spacing), new Vector3(410 * spacing, terrain.surfaceHeight(410, 414) + 110, 414 * spacing)));
+
             Random random = new Random();  // used for pack and cloud
             // create a Pack of dogs with Player as the leader
             Pack pack = new Pack(this, "dog", "dogV3", player.AgentObject);

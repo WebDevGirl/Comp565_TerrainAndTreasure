@@ -241,7 +241,20 @@ namespace AGMGSK
                     return true;
             return false;
         }
-
+        /// <summary>
+        /// Does an object at a certain position with a radius collide with the current instance.
+        /// </summary>
+        /// <param name="position">2nd objects position</param>
+        /// <param name="radius">2nd objects bounding radius</param>
+        /// <returns></returns>
+        public bool CheckForCollision(Vector3 position, float radius)
+        {
+            if (Vector3.Distance(position, this.Translation) <= radius + this.objectBoundingSphereRadius)
+            {
+                return true;
+            }
+            return false;
+        }
 
         private void scaleObjectBoundingSphere()
         {
