@@ -89,11 +89,11 @@ namespace AGMGSK
             // path is built to work on specific terrain
             terrian_path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
             stage.Components.Add(terrian_path);
-
-
+                      
             path = terrian_path; // start off in path finding mode
             nextGoal = path.NextNode;  // get first path goal
             agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
+            Debug.WriteLine("Wake Up Agent");
         }
 
         /// <summary>
@@ -114,16 +114,21 @@ namespace AGMGSK
                     savedGoal = nextGoal; 
 
                     // Set current treasure finding path to closest treasure
-                    treasure_path = new Path(stage, chooseClosestTreasure(stage.Treasures), Path.PathType.SINGLE);
-
+                    Treasure treasure = chooseClosestTreasure(stage.Treasures);
+          
                     // if treasure found find it by setting path nextGoal
-                    if (treasure_path.Count != 0)
-                    {                      
-                        restart(); // Start moving again incase we are stopped
+                    if (treasure != null)
+                    {
+                        Debug.WriteLine("Treasure Path Generated");
+                        // Generate Path from treasure position to agent                       
+                        treasure_path = stage.graph.GetAStarPath(treasure.position, new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z));          
                         stage.Components.Add(treasure_path);
+                        
                         path = treasure_path;
                         nextGoal = path.NextNode;
                         agentObject.turnToFace(nextGoal.Translation);
+
+                        restart(); // Start moving again incase we are stopped
                     } else {
                         Debug.WriteLine("No treasures found, stop"); 
                         base.reset();
@@ -132,22 +137,24 @@ namespace AGMGSK
                     break;
                 case 1: // Switch to Mode: TM --> RM
                     Debug.WriteLine("Switching Mode: Treasure Mode --> Return Mode (" + mode + " --> " + (mode + 1) % 3 + " )");
-                    mode = 2;                  
-                    path = terrian_path;  // Set path back to Explore Mode Path   
-                    nextGoal = savedGoal;
+                    mode = 2;
+                    
+                    path.reverse();
+                    nextGoal = path.NextNode;
                     agentObject.turnToFace(nextGoal.Translation);
+                    
+                    restart();                    
                     break;
                 case 2: // Switch to Mode: RM --> EM
                     Debug.WriteLine("Switching Mode: Return Mode --> Explore Mode (" + mode + " --> " + (mode + 1) % 3 + " )");
                     mode = 0;
+                    stage.Components.Remove(treasure_path); // Remove waypoints from ASTAR
                     path = terrian_path; // Set path back to Explore Mode Path  
-                   
-                    // Update goal if we reached our last saved goal, otherwise keep savedGoal
-                    if (nextGoal != savedGoal)
-                    {
-                        nextGoal = path.NextNode;
-                    }
+
+                    nextGoal = savedGoal;
                     agentObject.turnToFace(nextGoal.Translation);
+                    restart();  
+
                     break;
                 default:
                     Debug.WriteLine("Bad Toggle Mode");
@@ -172,17 +179,15 @@ namespace AGMGSK
         /// <returns>NavNode</returns>
         public void setNextGoal()
         {
-            if (path.Done && mode == 1) { // Current path is done as we are in TreasureMode
-                switchMode();               
+            
+            if (path.Done) {
+                switchMode();
             }
-            else if (mode == 2) { // Current path is done and we are in ReturnMode
-                switchMode();                
-            } else { 
+            else
+            {
                 nextGoal = path.NextNode;
                 agentObject.turnToFace(nextGoal.Translation);
-            }     
-      
-            
+            }          
         }
 
 
@@ -190,13 +195,12 @@ namespace AGMGSK
         /// Procedurally make a path for NPAgent to traverse to the closest un-tagged treasure
         /// </summary>
         /// <returns></returns>
-        private List<NavNode> chooseClosestTreasure(List<Treasure> treasures)
+        private Treasure chooseClosestTreasure(List<Treasure> treasures)
         {
             float distance = 0;
             float minDistance = 10000000000000000;
             Treasure minTreasure = null;
-            List<NavNode> aPath = new List<NavNode>();
-            
+               
             /* Loop through all treasures to find one that is closest to npAgent */
             foreach (Treasure treasure in treasures)
             {
@@ -217,15 +221,8 @@ namespace AGMGSK
                     }
                 }
             }
-                                  
-            /* Set path to treasure or if untagged one found */
-            if (minTreasure != null)
-            { 
-                // create a path to the treasure   
-                aPath.Add(new NavNode(minTreasure.position, NavNode.NavNodeEnum.PATH));
-            }
-         
-            return (aPath);
+
+            return minTreasure;
         }
 
         /// <summary>
@@ -251,24 +248,33 @@ namespace AGMGSK
                      NavNode.NavNodeEnum.WAYPOINT));
             aPath.Add(new NavNode(new Vector3(383 * spacing, stage.Terrain.surfaceHeight(383, 500), 500 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
+
+
+            aPath.Add(new NavNode(new Vector3(310 * spacing, stage.Terrain.surfaceHeight(310, 480), 480 * spacing),
+                   NavNode.NavNodeEnum.WAYPOINT));
+
+
             //// go by wall   
-            //aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //// turning circle 
-            //aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
-            //aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
-            //         NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+
+           
+
+            aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            // turning circle 
+            aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+                     NavNode.NavNodeEnum.WAYPOINT));
             return (aPath);
         }
 
@@ -292,7 +298,7 @@ namespace AGMGSK
                         new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z)
                     );
 
-                   if (distance < 28000)
+                   if (distance < 20000)
                    {
                        Debug.WriteLine("Treasure Detected!! Search for it. " + distance);
                        switchMode();
@@ -327,6 +333,19 @@ namespace AGMGSK
             stage.setInfo(16,
                string.Format("nextGoal:  ({0:f0},{1:f0},{2:f0})", nextGoal.Translation.X, nextGoal.Translation.Y, nextGoal.Translation.Z));
 
+            if (savedGoal != null)
+            {
+                stage.setInfo(17,
+               string.Format("savedGoal:  ({0:f0},{1:f0},{2:f0})", savedGoal.Translation.X, savedGoal.Translation.Y, savedGoal.Translation.Z));
+            }
+            else {
+                stage.setInfo(17,
+                   string.Format("savedGoal: null"));
+            }
+
+            
+              
+
             // See if at or close to nextGoal, distance measured in the flat XZ plane
             float distance = Vector3.Distance(
                new Vector3(nextGoal.Translation.X, 0, nextGoal.Translation.Z),
@@ -341,10 +360,7 @@ namespace AGMGSK
                 {
                     savedGoal = null;
                 }
-
-                // Set Next Goal, includes switching to the correct mode
-                setNextGoal();                
-
+               
                 // See if we should stop or turn twoards next goal
                 if (path.Done)
                 {
@@ -352,8 +368,11 @@ namespace AGMGSK
                     base.reset(); // Stop NP Agent
                 } else {
                     turnCount++;
-                    stage.setInfo(17, string.Format("turnToFace count = {0}", turnCount));
+                    stage.setInfo(18, string.Format("turnToFace count = {0}", turnCount));
                 }
+                
+                // Set Next Goal, includes switching to the correct mode
+                setNextGoal(); 
             }
 
             senseTreasures();

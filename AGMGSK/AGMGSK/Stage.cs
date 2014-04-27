@@ -116,7 +116,7 @@ namespace AGMGSK
         protected int draws, updates;
         // Treasures to tag
         protected List<Treasure> treasures = new List<Treasure>();
-        protected Graph graph;
+        public  Graph graph;
         /// <summary>
         /// Set the Scene.
         /// The Scene contains all "application-specific" content that is to added to
@@ -477,8 +477,8 @@ namespace AGMGSK
             tr = new Treasure(this, "t2", "hash");
             tr.addObject(new Vector3(446 * spacing, terrain.surfaceHeight(446, 450) + 110, 450 * spacing),
                 new Vector3(0, 1, 0), 1.45f);
-            Components.Add(tr);
-            treasures.Add(tr);
+           Components.Add(tr);
+           treasures.Add(tr);
 
             tr = new Treasure(this, "t3", "hash");
             tr.addObject(new Vector3(348 * spacing, terrain.surfaceHeight(348, 330) + 110, 330 * spacing),
@@ -500,6 +500,12 @@ namespace AGMGSK
             {
                 for (int j = 1; j < 12; j++)
                 {
+                    pillar = new Model3D(this, "p_sm" + i, "pillar_sm");
+                    pillar.IsCollidable = true;
+                    pillar.addObject(new Vector3(((253 + (offset * i)) * spacing+120), terrain.surfaceHeight(253 + (offset * i), 250 + (offset * j)) + 50, ((250 + (offset * j)) * spacing)-80),
+                        new Vector3(0, 1, 0), 0.79f);
+                    Components.Add(pillar);
+
                     pillar = new Model3D(this, "p" + i, "pillar");
                     pillar.addObject(new Vector3((250 + (offset * i)) * spacing, terrain.surfaceHeight(250 + (offset * i), 250 + (offset * j)) + 300, (250 + (offset * j)) * spacing),
                         new Vector3(0, 1, 0), 0.79f);

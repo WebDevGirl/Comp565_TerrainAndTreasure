@@ -78,7 +78,7 @@ namespace AGMGSK
             stage = theStage;
             done = false;
         }
-
+        
         /// <summary>
         /// Create a path from XZ nodes defined in a pathFile.
         /// The file must be accessible from the executable environment.
@@ -117,6 +117,16 @@ namespace AGMGSK
         public int Count { get { return node.Count; } }
 
         public bool Done { get { return done; } }
+
+        /// <summary>
+        /// Reverse nodes in path
+        /// </summary>
+        public void reverse()
+        {
+            node.Reverse(0, node.Count);
+            nextNode = 0;
+            done = false;
+        }
 
         /// <summary>
         /// Gets the next node in the path using path's PathType
