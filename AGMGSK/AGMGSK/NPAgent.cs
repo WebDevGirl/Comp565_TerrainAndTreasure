@@ -89,7 +89,13 @@ namespace AGMGSK
             // path is built to work on specific terrain
             terrian_path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
             stage.Components.Add(terrian_path);
-            terrian_path.reverse();     
+            Random rnd = new Random();
+            if (rnd.Next() % 2 == 0)
+            {
+                // Reverse the path 
+                terrian_path.reverse(); 
+            }
+                            
             path = terrian_path; // start off in path finding mode
             nextGoal = path.NextNode;  // get first path goal
             agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
