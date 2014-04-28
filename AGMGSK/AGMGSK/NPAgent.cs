@@ -63,7 +63,7 @@ namespace AGMGSK
         private Path path;
         private Path terrian_path;
         private Path treasure_path;
-        private int snapDistance = 20;
+        private int snapDistance = 30;
         private int turnCount = 0;
         private int mode = 0;
 
@@ -89,7 +89,7 @@ namespace AGMGSK
             // path is built to work on specific terrain
             terrian_path = new Path(stage, makePath(), Path.PathType.REVERSE); // continuous search path
             stage.Components.Add(terrian_path);
-                      
+            terrian_path.reverse();     
             path = terrian_path; // start off in path finding mode
             nextGoal = path.NextNode;  // get first path goal
             agentObject.turnToFace(nextGoal.Translation);  // orient towards the first path goal
@@ -180,13 +180,14 @@ namespace AGMGSK
         public void setNextGoal()
         {
             
-            if (path.Done) {
-                switchMode();
+            if (path.Done) {               
+                switchMode(); 
+                agentObject.turnToFace(nextGoal.Translation);
             }
             else
-            {
+            {              
                 nextGoal = path.NextNode;
-                agentObject.turnToFace(nextGoal.Translation);
+                agentObject.turnToFace(nextGoal.Translation);                
             }          
         }
 
@@ -198,7 +199,7 @@ namespace AGMGSK
         private Treasure chooseClosestTreasure(List<Treasure> treasures)
         {
             float distance = 0;
-            float minDistance = 10000000000000000;
+            float minDistance = float.MaxValue;
             Treasure minTreasure = null;
                
             /* Loop through all treasures to find one that is closest to npAgent */
@@ -248,32 +249,26 @@ namespace AGMGSK
                      NavNode.NavNodeEnum.WAYPOINT));
             aPath.Add(new NavNode(new Vector3(383 * spacing, stage.Terrain.surfaceHeight(383, 500), 500 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
-
-
-            aPath.Add(new NavNode(new Vector3(310 * spacing, stage.Terrain.surfaceHeight(310, 480), 480 * spacing),
-                   NavNode.NavNodeEnum.WAYPOINT));
-
-
+                
             //// go by wall   
             aPath.Add(new NavNode(new Vector3(445 * spacing, stage.Terrain.surfaceHeight(445, 438), 438 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
-
-           
-
+      
+            
             aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 383), 383 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
             aPath.Add(new NavNode(new Vector3(500 * spacing, stage.Terrain.surfaceHeight(500, 100), 100 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
             aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 105), 105 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 505), 505 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
             // turning circle 
             aPath.Add(new NavNode(new Vector3(80 * spacing, stage.Terrain.surfaceHeight(80, 505), 505 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
             aPath.Add(new NavNode(new Vector3(60 * spacing, stage.Terrain.surfaceHeight(60, 490), 490 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
-            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 495), 495 * spacing),
+            aPath.Add(new NavNode(new Vector3(105 * spacing, stage.Terrain.surfaceHeight(105, 505), 505 * spacing),
                      NavNode.NavNodeEnum.WAYPOINT));
             return (aPath);
         }
@@ -298,7 +293,7 @@ namespace AGMGSK
                         new Vector3(agentObject.Translation.X, 0, agentObject.Translation.Z)
                     );
 
-                   if (distance < 20000)
+                   if (distance < 5000)
                    {
                        Debug.WriteLine("Treasure Detected!! Search for it. " + distance);
                        switchMode();

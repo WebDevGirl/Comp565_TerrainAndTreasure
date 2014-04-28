@@ -131,10 +131,12 @@ namespace AGMGSK
             player = new Player(this, "Chaser",
                new Vector3(510 * spacing, terrain.surfaceHeight(510, 507), 507 * spacing),
                new Vector3(0, 1, 0), 0.80f, "redAvatarV3");  // face looking diagonally across stage
+            player.IsCollidable = true;
             Components.Add(player);
             npAgent = new NPAgent(this, "Evader",
                new Vector3(400 * spacing, terrain.surfaceHeight(400, 400), 400 * spacing),
                new Vector3(0, 1, 0), 0.0f, "magentaAvatarV3");  // facing +Z
+            npAgent.IsCollidable = true;
             Components.Add(npAgent);
         }
 
@@ -455,6 +457,7 @@ namespace AGMGSK
             npAgent = new NPAgent(this, "Evader",
                new Vector3(490 * spacing, terrain.surfaceHeight(490, 475), 475 * spacing),
                new Vector3(0, 1, 0), 0.0f, "magentaAvatarV3");  // facing +Z
+            npAgent.IsCollidable = false;
             // npAgent does not test for collisions
             Components.Add(npAgent);
             // ----------- CREATE OPTIONAL CONTENT HERE -----------------------
@@ -468,7 +471,7 @@ namespace AGMGSK
 
             // Add Treasures To Map
             Treasure tr = new Treasure(this, "t1", "hash");
-            tr.addObject(new Vector3(450 * spacing, terrain.surfaceHeight(450, 500) + 110, 500 * spacing),
+            tr.addObject(new Vector3(477 * spacing, terrain.surfaceHeight(477, 290) + 110, 290 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
             treasures.Add(tr);
@@ -480,14 +483,24 @@ namespace AGMGSK
            Components.Add(tr);
            treasures.Add(tr);
 
+
+           // Before Gibson
+           tr = new Treasure(this, "t5", "hash");
+           tr.addObject(new Vector3(470 * spacing, terrain.surfaceHeight(470, 144) + 210, 144 * spacing),
+               new Vector3(0, 1, 0), 0.79f);
+           Components.Add(tr);
+           treasures.Add(tr);
+
+            // Inside Gibson
             tr = new Treasure(this, "t3", "hash");
-            tr.addObject(new Vector3(348 * spacing, terrain.surfaceHeight(348, 330) + 110, 330 * spacing),
+            tr.addObject(new Vector3(507 * spacing, terrain.surfaceHeight(507, 425) + 110, 425 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
             treasures.Add(tr);
 
+            // On Hill
             tr = new Treasure(this, "t4", "hash");
-            tr.addObject(new Vector3(297 * spacing, terrain.surfaceHeight(297, 340) + 210, 340 * spacing),
+            tr.addObject(new Vector3(470 * spacing, terrain.surfaceHeight(470, 144) + 210, 144 * spacing),
                 new Vector3(0, 1, 0), 0.79f);
             Components.Add(tr);
             treasures.Add(tr);
@@ -500,15 +513,20 @@ namespace AGMGSK
             {
                 for (int j = 1; j < 12; j++)
                 {
+                   /* Set Coordinators */
+                    int x = (353 + (offset * i)) * spacing;
+                    int z = (269 + (offset * j)) * spacing;
+                    float y = terrain.surfaceHeight(x, z);
+
+                    /* Add Small pillar inside big pillar to deal with collisions for now */ 
                     pillar = new Model3D(this, "p_sm" + i, "pillar_sm");
                     pillar.IsCollidable = true;
-                    pillar.addObject(new Vector3(((253 + (offset * i)) * spacing+120), terrain.surfaceHeight(253 + (offset * i), 250 + (offset * j)) + 50, ((250 + (offset * j)) * spacing)-80),
-                        new Vector3(0, 1, 0), 0.79f);
+                    pillar.addObject(new Vector3(x + 570, y + 50, z-80), new Vector3(0, 1, 0), 0.79f);
                     Components.Add(pillar);
-
+                    
+                    /* Gibson Pillar */ 
                     pillar = new Model3D(this, "p" + i, "pillar");
-                    pillar.addObject(new Vector3((250 + (offset * i)) * spacing, terrain.surfaceHeight(250 + (offset * i), 250 + (offset * j)) + 300, (250 + (offset * j)) * spacing),
-                        new Vector3(0, 1, 0), 0.79f);
+                    pillar.addObject(new Vector3(x, y + 300, z),  new Vector3(0, 1, 0), 0.79f);
                     Components.Add(pillar);
                 }
             }
