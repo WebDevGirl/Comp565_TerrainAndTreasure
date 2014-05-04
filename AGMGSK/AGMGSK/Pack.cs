@@ -102,7 +102,7 @@ namespace AGMGSK
             // if (leader == null) need to determine "virtual leader from members"
             float angle = 0.3f;
 
-            if (leader == null)
+            if (leader == null || getLevelValue() == 0)
             {
                 foreach (Object3D obj in instance)
                 {
@@ -123,9 +123,9 @@ namespace AGMGSK
                 foreach (Object3D obj in instance)
                 {
 
-                    obj.Translation += getCohesion(obj) + getSeparation(obj);
+                    obj.Translation += getSeparation(obj) + getCohesion(obj);
                     
-                    obj.Forward = leader.Forward;
+                   // obj.Forward = leader.Forward;
 
                     
                     obj.updateMovableObject();
@@ -158,19 +158,31 @@ namespace AGMGSK
 
         public Vector3 getAlignment(Object3D current)
         {
-           
             return Vector3.Normalize(leader.Forward);
 
         }
 
         public Vector3 getCohesion(Object3D current)
         {
-            if (current != leader)
+            Vector3 cohesion = Vector3.Zero;
+            int N = 0;
+
+            foreach (Object3D obj in instance)
             {
-                Vector3 cohesion = current.Translation - leader.Translation;
+                if (current != obj)
+                {
+                    cohesion += current.Translation - leader.Translation;
+                    N++;
+                }
+            }
+
+            if (N > 0)
+            {
+                cohesion /= N;
+                //cohesion -= current.Translation;
                 
                 cohesion.Normalize();
-                return cohesion * -10;
+                return cohesion * -10 * getLevelValue() / 100f;
             }
             return Vector3.Zero;
 
@@ -179,24 +191,27 @@ namespace AGMGSK
         public Vector3 getSeparation(Object3D current)
         {
             Vector3 separation = Vector3.Zero;
-            float distanceRadius = 5000;
+            float distanceRadius = 700;
             foreach (Object3D obj in instance)
             {
-                if (current != obj && current != leader)
+                if (current != obj)
                 {
-
-                    if (Vector3.Distance(current.Translation, leader.Translation) < distanceRadius)
+                    Vector3 header = obj.Translation - current.Translation;
+                    if (header.Length() < distanceRadius)
                     {
-                        separation = current.Translation - leader.Translation;
-                        float scale = separation.Length() / distanceRadius;
-
-                        separation.Normalize();
-                        separation /= scale;
-
+                        separation -= 7 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
                     }
                 }
             }
-            return separation;
+
+            if (Vector3.Distance(leader.Translation, current.Translation) < distanceRadius)
+            {
+                
+                Vector3 header = leader.Translation - current.Translation;
+                separation -= 7 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
+                
+            }
+            return separation * getLevelValue() / 100f;
         }
 
         public static int getLevelValue()
