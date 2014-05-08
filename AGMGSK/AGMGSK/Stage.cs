@@ -117,6 +117,8 @@ namespace AGMGSK
         // Treasures to tag
         protected List<Treasure> treasures = new List<Treasure>();
         public  Graph graph;
+        // Pack object to test flocking
+        protected Pack pack;
         /// <summary>
         /// Set the Scene.
         /// The Scene contains all "application-specific" content that is to added to
@@ -541,7 +543,7 @@ namespace AGMGSK
 
             Random random = new Random();  // used for pack and cloud
             // create a Pack of dogs with Player as the leader
-            Pack pack = new Pack(this, "dog", "dogV3", player.AgentObject);
+            pack = new Pack(this, "dog", "dogV3", player.AgentObject);
             Components.Add(pack);
             for (int x = -9; x < 10; x += 6)
                 for (int z = -3; z < 4; z += 6)
@@ -649,7 +651,7 @@ namespace AGMGSK
 
             else if (keyboardState.IsKeyDown(Keys.P) && !oldKeyboardState.IsKeyDown(Keys.P))
             {
-                Pack.changeFlockLevel();
+                pack.changeFlockLevel();
             }
             oldKeyboardState = keyboardState;    // Update saved state.
             checkForTreasure();

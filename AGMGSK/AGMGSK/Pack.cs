@@ -59,6 +59,8 @@ namespace AGMGSK
     {
         Object3D leader;
         Random random = null;
+        // flockMembers determines which boids will flock (true) and which will not (false)
+        List<Boolean> flockMembers;
 
         // Pack flocking level
         static FlockLevel level = FlockLevel.LOW;
@@ -90,6 +92,7 @@ namespace AGMGSK
             isCollidable = true;
             leader = aLeader;
             random = new Random();
+            flockMembers = new List<Boolean>();
         }
 
         /// <summary>
@@ -122,21 +125,35 @@ namespace AGMGSK
             {
                 foreach (Object3D obj in instance)
                 {
-                    //To-Do: Fix cohesion
-                    obj.Translation += getSeparation(obj);// +getCohesion(obj);
-                    obj.Forward = getAlignment(obj);
-                    obj.turnToFace(leader.Translation);
+                    // If a Boid is a flock member, apply flocking rules
+                    if (isFlockMember(obj))
+                    {
+                        obj.Translation += getCohesion(obj) + getSeparation(obj);
+                        obj.Forward = getAlignment(obj);
+                    }
+
+                    // Boid is not flocking, so use default movement
+                    else
+                    {
+                        obj.Yaw = 0.0f;
+                        // change direction 4 time a second  0.07 = 4/60
+                        if (random.NextDouble() < 0.07)
+                        {
+                            if (random.NextDouble() < 0.5) obj.Yaw -= angle; // turn left
+                            else obj.Yaw += angle; // turn right
+                        }
+                    }
                     
                     obj.updateMovableObject();
                     stage.setSurfaceHeight(obj);
                 }
-
             }
 
             base.Update(gameTime);  // MovableMesh's Update(); 
         }
 
-        public static void changeFlockLevel() 
+        // Toggle flock level between 0%, 33%, 66%, and 99%
+        public void changeFlockLevel() 
         {
             switch (level)
             {
@@ -153,8 +170,28 @@ namespace AGMGSK
                     level = FlockLevel.LOW;
                     break;
             }
+            // Based on flock level, set which boids will be flock members
+            setFlockMembers();
         }
 
+        public bool isFlockMember(Object3D current)
+        {
+            return flockMembers[instance.IndexOf(current)];
+        }
+
+        public void setFlockMembers()
+        {
+            // Create a new list with all the current boids in instance
+            flockMembers = new List<Boolean>();
+            foreach (Object3D obj in instance)
+            {
+                // Generate a random number between 0 and 100.
+                // If the value is less than or equal to the flock level, boid will be flock member
+                flockMembers.Add(((int)(random.NextDouble() * 100) <= getLevelValue()));
+            }
+        }
+
+        // Apply alignment rules
         public Vector3 getAlignment(Object3D current)
         {
             Vector3 alignment = leader.Forward;
@@ -175,34 +212,20 @@ namespace AGMGSK
                 averageDelta /= N;
                 averageDelta.Normalize();
             }
-            return -0.45f * averageDelta;
+            return 0.45f * averageDelta;
         }
 
+        // Apply cohesion rules
         public Vector3 getCohesion(Object3D current)
         {
-            Vector3 cohesion = leader.Translation;
-           // Vector3 leaderPosition = leader.Translation;
-            int N = 0;
-
-            foreach (Object3D obj in instance)
-            {
-                if (current != obj)
-                {
-                    cohesion += obj.Translation - current.Translation;
-                    N++;
-                }
-            }
-
-            if (N > 0)
-            {
-                cohesion /= (N + 1);
-                cohesion += current.Translation;
-                cohesion.Normalize();
-            }
-            return cohesion;
+            Vector3 cohesion = Vector3.Zero;
+            cohesion = leader.Translation - current.Translation;
+            cohesion.Normalize();
+            return cohesion * 15 * (float)random.NextDouble();
 
         }
 
+        // Apply separation rules
         public Vector3 getSeparation(Object3D current)
         {
             Vector3 separation = Vector3.Zero;
@@ -214,7 +237,7 @@ namespace AGMGSK
                     Vector3 header = current.Translation - obj.Translation;
                     if (header.Length() < distanceRadius)
                     {
-                        separation += Vector3.Normalize(header) / (header.Length() / distanceRadius);
+                        separation += 5 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
                     }
                 }
             }
@@ -223,12 +246,13 @@ namespace AGMGSK
             {
                 
                 Vector3 header = current.Translation - leader.Translation;
-                separation += 7 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
+                separation += 5 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
                 
             }
-            return 3 * separation;
+            return 2 * separation;
         }
 
+        // Get the int value of the flock level
         public static int getLevelValue()
         {
             return (int)level;
