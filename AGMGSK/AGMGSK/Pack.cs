@@ -122,11 +122,10 @@ namespace AGMGSK
             {
                 foreach (Object3D obj in instance)
                 {
-
-                    obj.Translation += getSeparation(obj) + getCohesion(obj);
-                    
-                   // obj.Forward = leader.Forward;
-
+                    //To-Do: Fix cohesion
+                    obj.Translation += getSeparation(obj);// +getCohesion(obj);
+                    obj.Forward = getAlignment(obj);
+                    obj.turnToFace(leader.Translation);
                     
                     obj.updateMovableObject();
                     stage.setSurfaceHeight(obj);
@@ -158,33 +157,49 @@ namespace AGMGSK
 
         public Vector3 getAlignment(Object3D current)
         {
-            return Vector3.Normalize(leader.Forward);
-
-        }
-
-        public Vector3 getCohesion(Object3D current)
-        {
-            Vector3 cohesion = Vector3.Zero;
+            Vector3 alignment = leader.Forward;
+            Vector3 averageDelta = Vector3.Zero;
             int N = 0;
 
             foreach (Object3D obj in instance)
             {
-                if (current != obj)
+                if (obj != current)
                 {
-                    cohesion += current.Translation - leader.Translation;
+                    averageDelta += alignment - current.Forward;
                     N++;
                 }
             }
 
             if (N > 0)
             {
-                cohesion /= N;
-                //cohesion -= current.Translation;
-                
-                cohesion.Normalize();
-                return cohesion * -10 * getLevelValue() / 100f;
+                averageDelta /= N;
+                averageDelta.Normalize();
             }
-            return Vector3.Zero;
+            return -0.45f * averageDelta;
+        }
+
+        public Vector3 getCohesion(Object3D current)
+        {
+            Vector3 cohesion = leader.Translation;
+           // Vector3 leaderPosition = leader.Translation;
+            int N = 0;
+
+            foreach (Object3D obj in instance)
+            {
+                if (current != obj)
+                {
+                    cohesion += obj.Translation - current.Translation;
+                    N++;
+                }
+            }
+
+            if (N > 0)
+            {
+                cohesion /= (N + 1);
+                cohesion += current.Translation;
+                cohesion.Normalize();
+            }
+            return cohesion;
 
         }
 
@@ -196,10 +211,10 @@ namespace AGMGSK
             {
                 if (current != obj)
                 {
-                    Vector3 header = obj.Translation - current.Translation;
+                    Vector3 header = current.Translation - obj.Translation;
                     if (header.Length() < distanceRadius)
                     {
-                        separation -= 7 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
+                        separation += Vector3.Normalize(header) / (header.Length() / distanceRadius);
                     }
                 }
             }
@@ -207,11 +222,11 @@ namespace AGMGSK
             if (Vector3.Distance(leader.Translation, current.Translation) < distanceRadius)
             {
                 
-                Vector3 header = leader.Translation - current.Translation;
-                separation -= 7 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
+                Vector3 header = current.Translation - leader.Translation;
+                separation += 7 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
                 
             }
-            return separation * getLevelValue() / 100f;
+            return 3 * separation;
         }
 
         public static int getLevelValue()
