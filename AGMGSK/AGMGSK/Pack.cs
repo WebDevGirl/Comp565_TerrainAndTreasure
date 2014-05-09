@@ -198,6 +198,7 @@ namespace AGMGSK
             Vector3 averageDelta = Vector3.Zero;
             int N = 0;
 
+            // Get the average difference between the current boid's forward vector and leader's
             foreach (Object3D obj in instance)
             {
                 if (obj != current)
@@ -219,8 +220,11 @@ namespace AGMGSK
         public Vector3 getCohesion(Object3D current)
         {
             Vector3 cohesion = Vector3.Zero;
+            // Get vector toward leader's position
             cohesion = leader.Translation - current.Translation;
             cohesion.Normalize();
+
+            // Multiply by random cohesion force between 0 and 15
             return cohesion * 15 * (float)random.NextDouble();
 
         }
@@ -235,6 +239,8 @@ namespace AGMGSK
                 if (current != obj)
                 {
                     Vector3 header = current.Translation - obj.Translation;
+                    // If distance between current boid and another object is less than distanceRadius
+                    // add to the separation force
                     if (header.Length() < distanceRadius)
                     {
                         separation += 5 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
@@ -242,9 +248,9 @@ namespace AGMGSK
                 }
             }
 
+            // Add separation between leader and other boids
             if (Vector3.Distance(leader.Translation, current.Translation) < distanceRadius)
             {
-                
                 Vector3 header = current.Translation - leader.Translation;
                 separation += 5 * Vector3.Normalize(header) / (header.Length() / distanceRadius);
                 
